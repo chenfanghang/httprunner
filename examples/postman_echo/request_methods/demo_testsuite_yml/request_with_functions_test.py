@@ -2,7 +2,7 @@
 # FROM: request_methods/request_with_functions.yml
 
 
-from httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
+from rrtv_httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
 
 
 class TestCaseRequestWithFunctions(HttpRunner):

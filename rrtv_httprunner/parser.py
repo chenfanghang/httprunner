@@ -7,8 +7,8 @@ from typing import Any, Set, Text, Callable, List, Dict, Union
 from loguru import logger
 from sentry_sdk import capture_exception
 
-from httprunner import loader, utils, exceptions
-from httprunner.models import VariablesMapping, FunctionsMapping
+from rrtv_httprunner import loader, utils, exceptions
+from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -261,7 +261,7 @@ def get_mapping_function(
 
     elif function_name in ["multipart_encoder", "multipart_content_type"]:
         # extension for upload test
-        from httprunner.ext import uploader
+        from rrtv_httprunner.ext import uploader
 
         return getattr(uploader, function_name)
 

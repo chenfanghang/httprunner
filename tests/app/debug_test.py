@@ -2,7 +2,7 @@ import unittest
 
 from starlette.testclient import TestClient
 
-from httprunner.app.main import app
+from rrtv_httprunner.app.main import app
 
 client = TestClient(app)
 

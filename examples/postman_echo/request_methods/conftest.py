@@ -2,7 +2,7 @@ import uuid
 from typing import List
 
 import pytest
-from httprunner import Config, Step
+from rrtv_httprunner import Config, Step
 from loguru import logger
 
 

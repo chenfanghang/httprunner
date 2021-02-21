@@ -7,7 +7,7 @@ import random
 import string
 import time
 
-from httprunner.exceptions import ParamsError
+from rrtv_httprunner.exceptions import ParamsError
 
 
 def gen_random_string(str_len):

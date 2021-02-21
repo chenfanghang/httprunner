@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from httprunner import exceptions, loader
+from rrtv_httprunner import exceptions, loader
 
 
 class TestLoader(unittest.TestCase):

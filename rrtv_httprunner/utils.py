@@ -11,15 +11,15 @@ from typing import Dict, List, Any, Union, Text
 import sentry_sdk
 from loguru import logger
 
-from httprunner import __version__
-from httprunner import exceptions
-from httprunner.models import VariablesMapping
+from rrtv_httprunner import __version__
+from rrtv_httprunner import exceptions
+from rrtv_httprunner.models import VariablesMapping
 
 
 def init_sentry_sdk():
     sentry_sdk.init(
         dsn="https://460e31339bcb428c879aafa6a2e78098@sentry.io/5263855",
-        release="httprunner@{}".format(__version__),
+        release="rrtv_httprunner@{}".format(__version__),
     )
     with sentry_sdk.configure_scope() as scope:
         scope.set_user({"id": uuid.getnode()})

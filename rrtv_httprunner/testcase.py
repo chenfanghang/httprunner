@@ -1,7 +1,7 @@
 import inspect
 from typing import Text, Any, Union, Callable
 
-from httprunner.models import (
+from rrtv_httprunner.models import (
     TConfig,
     TStep,
     TRequest,

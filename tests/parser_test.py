@@ -2,9 +2,9 @@ import os
 import time
 import unittest
 
-from httprunner import parser
-from httprunner.exceptions import VariableNotFound, FunctionNotFound
-from httprunner.loader import load_project_meta
+from rrtv_httprunner import parser
+from rrtv_httprunner.exceptions import VariableNotFound, FunctionNotFound
+from rrtv_httprunner.loader import load_project_meta
 
 
 class TestParserBasic(unittest.TestCase):

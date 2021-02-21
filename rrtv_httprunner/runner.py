@@ -13,16 +13,16 @@ except ModuleNotFoundError:
 
 from loguru import logger
 
-from httprunner import utils, exceptions
-from httprunner.client import HttpSession
-from httprunner.exceptions import ValidationFailure, ParamsError
-from httprunner.ext.uploader import prepare_upload_step
-from httprunner.loader import load_project_meta, load_testcase_file
-from httprunner.parser import build_url, parse_data, parse_variables_mapping
-from httprunner.response import ResponseObject
-from httprunner.testcase import Config, Step
-from httprunner.utils import merge_variables
-from httprunner.models import (
+from rrtv_httprunner import utils, exceptions
+from rrtv_httprunner.client import HttpSession
+from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
+from rrtv_httprunner.ext.uploader import prepare_upload_step
+from rrtv_httprunner.loader import load_project_meta, load_testcase_file
+from rrtv_httprunner.parser import build_url, parse_data, parse_variables_mapping
+from rrtv_httprunner.response import ResponseObject
+from rrtv_httprunner.testcase import Config, Step
+from rrtv_httprunner.utils import merge_variables
+from rrtv_httprunner.models import (
     TConfig,
     TStep,
     VariablesMapping,
@@ -220,7 +220,7 @@ class HttpRunner(object):
             step_data.success = session_success
 
             if hasattr(self.__session, "data"):
-                # httprunner.client.HttpSession, not locust.clients.HttpSession
+                # rrtv_httprunner.client.HttpSession, not locust.clients.HttpSession
                 # save request & response meta data
                 self.__session.data.success = session_success
                 self.__session.data.validators = resp_obj.validation_results

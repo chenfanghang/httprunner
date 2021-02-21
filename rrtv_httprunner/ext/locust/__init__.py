@@ -32,7 +32,7 @@ pytest_files: List = []
 def is_httprunner_testcase(item):
     """ check if a variable is a HttpRunner testcase class
     """
-    from httprunner import HttpRunner
+    from rrtv_httprunner import HttpRunner
 
     # TODO: skip referenced testcase
     return bool(
@@ -70,7 +70,7 @@ def prepare_locust_tests() -> List:
 def main_locusts():
     """ locusts entrance
     """
-    from httprunner.utils import init_sentry_sdk
+    from rrtv_httprunner.utils import init_sentry_sdk
     from sentry_sdk import capture_message
 
     init_sentry_sdk()
@@ -102,7 +102,7 @@ def main_locusts():
         print("Testcase file is not specified, exit 1.")
         sys.exit(1)
 
-    from httprunner.make import main_make
+    from rrtv_httprunner.make import main_make
 
     global pytest_files
     testcase_file_path = sys.argv[testcase_index]

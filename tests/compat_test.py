@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from httprunner import compat, exceptions, loader
+from rrtv_httprunner import compat, exceptions, loader
 
 
 class TestCompat(unittest.TestCase):

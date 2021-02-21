@@ -6,7 +6,7 @@
 `HttpRunner` is available on [`PyPI`][PyPI] and can be installed through `pip`.
 
 ```bash
-$ pip3 install httprunner
+$ pip3 install rrtv_httprunner
 ```
 
 If you want to keep up with the latest version, you can install with github repository url.
@@ -18,7 +18,7 @@ $ pip3 install git+https://github.com/httprunner/httprunner.git@master
 If you have installed `HttpRunner` before and want to upgrade to the latest version, you can use the `-U` option.
 
 ```bash
-$ pip3 install -U httprunner
+$ pip3 install -U rrtv_httprunner
 $ pip3 install -U git+https://github.com/httprunner/httprunner.git@master
 ```
 

@@ -9,7 +9,7 @@ Usage:
 
 """
 
-from httprunner.ext.har2case.core import HarParser
+from rrtv_httprunner.ext.har2case.core import HarParser
 from sentry_sdk import capture_message
 
 

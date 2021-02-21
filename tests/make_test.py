@@ -1,8 +1,8 @@
 import os
 import unittest
 
-from httprunner import loader
-from httprunner.make import (
+from rrtv_httprunner import loader
+from rrtv_httprunner.make import (
     main_make,
     convert_testcase_path,
     pytest_files_made_cache_mapping,

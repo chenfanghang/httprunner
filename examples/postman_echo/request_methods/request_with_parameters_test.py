@@ -3,10 +3,10 @@
 
 
 import pytest
-from httprunner import Parameters
+from rrtv_httprunner import Parameters
 
 
-from httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
+from rrtv_httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
 
 
 class TestCaseRequestWithParameters(HttpRunner):

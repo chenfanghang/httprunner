@@ -6,7 +6,7 @@ import time
 import pytest
 from loguru import logger
 
-from httprunner.utils import get_platform, ExtendJSONEncoder
+from rrtv_httprunner.utils import get_platform, ExtendJSONEncoder
 
 
 @pytest.fixture(scope="session", autouse=True)

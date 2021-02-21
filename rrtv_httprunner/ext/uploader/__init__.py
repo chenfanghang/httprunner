@@ -46,8 +46,8 @@ import os
 import sys
 from typing import Text, NoReturn
 
-from httprunner.models import TStep, FunctionsMapping
-from httprunner.parser import parse_variables_mapping
+from rrtv_httprunner.models import TStep, FunctionsMapping
+from rrtv_httprunner.parser import parse_variables_mapping
 from loguru import logger
 
 try:
@@ -68,8 +68,8 @@ def ensure_upload_ready():
     install with pip:
     $ pip install requests_toolbelt filetype
 
-    or you can install httprunner with optional upload dependencies:
-    $ pip install "httprunner[upload]"
+    or you can install rrtv_httprunner with optional upload dependencies:
+    $ pip install "rrtv_httprunner[upload]"
     """
     logger.error(msg)
     sys.exit(1)
@@ -143,7 +143,7 @@ def multipart_encoder(**kwargs):
             is_exists_file = os.path.isfile(value)
         else:
             # value is not absolute file path, check if it is relative file path
-            from httprunner.loader import load_project_meta
+            from rrtv_httprunner.loader import load_project_meta
 
             project_meta = load_project_meta("")
 

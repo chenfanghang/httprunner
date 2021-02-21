@@ -40,7 +40,7 @@ assignees: debugtalk
 
 ```bash
 $ pwd
-/Users/debugtalk/MyProjects/HttpRunner-dev/httprunner/tests
+/Users/debugtalk/MyProjects/HttpRunner-dev/rrtv_httprunner/tests
 $ hrun testcases/setup.yml
 INFO     Loading environment variables from /Users/debugtalk/MyProjects/HttpRunner-dev/HttpRunner/tests/.env
 ERROR    !!!!!!!!!! exception stage: load tests !!!!!!!!!!

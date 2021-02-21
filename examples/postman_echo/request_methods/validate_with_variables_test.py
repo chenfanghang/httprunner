@@ -2,7 +2,7 @@
 # FROM: request_methods/validate_with_variables.yml
 
 
-from httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
+from rrtv_httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
 
 
 class TestCaseValidateWithVariables(HttpRunner):

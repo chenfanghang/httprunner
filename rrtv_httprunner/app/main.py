@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from httprunner import __version__
+from rrtv_httprunner import __version__
 from .routers import deps, debugtalk, debug
 
 app = FastAPI()

@@ -2,7 +2,7 @@
 # FROM: load_image.yml
 
 
-from httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
+from rrtv_httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
 
 
 class TestCaseLoadImage(HttpRunner):

@@ -2,7 +2,7 @@ import random
 
 from locust import task, HttpUser, between
 
-from httprunner.ext.locust import prepare_locust_tests
+from rrtv_httprunner.ext.locust import prepare_locust_tests
 
 
 class HttpRunnerUser(HttpUser):

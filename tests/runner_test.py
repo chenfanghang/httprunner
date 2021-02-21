@@ -1,9 +1,9 @@
 import os
 import unittest
 
-from httprunner import loader
-from httprunner.cli import main_run
-from httprunner.runner import HttpRunner
+from rrtv_httprunner import loader
+from rrtv_httprunner.cli import main_run
+from rrtv_httprunner.runner import HttpRunner
 
 
 class TestHttpRunner(unittest.TestCase):

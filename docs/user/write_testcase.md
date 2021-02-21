@@ -20,7 +20,7 @@ Each testcase is a subclass of `HttpRunner`, and must have two class attributes:
 - teststeps: list of teststep (`List[Step]`), each step is corresponding to a API request or another testcase reference call. Besides, `variables`/`extract`/`validate`/`hooks` mechanisms are supported to create extremely complex test scenarios.
 
 ```python
-from httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
+from rrtv_httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
 
 
 class TestCaseRequestWithFunctions(HttpRunner):
@@ -209,7 +209,7 @@ import sys
 
 sys.path.insert(0, os.getcwd())
 
-from httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
+from rrtv_httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
 
 from examples.postman_echo.request_methods.request_with_functions_test import (
     TestCaseRequestWithFunctions as RequestWithFunctions,

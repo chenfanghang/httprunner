@@ -9,7 +9,7 @@ site_author: 'debugtalk'
 
 # Repository
 repo_name: HttpRunner
-repo_url: https://github.com/httprunner/httprunner
+repo_url: https://github.com/rrtv_httprunner/rrtv_httprunner
 edit_uri: ""
 
 # Copyright
@@ -47,7 +47,7 @@ extra:
         -   icon: material/library
             link: https://debugtalk.com
         -   icon: fontawesome/brands/github-alt
-            link: 'https://github.com/httprunner'
+            link: 'https://github.com/rrtv_httprunner'
 
 # index pages
 nav:

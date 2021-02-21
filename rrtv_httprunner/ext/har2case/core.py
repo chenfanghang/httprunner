@@ -5,12 +5,12 @@ import sys
 import urllib.parse as urlparse
 from typing import Text
 
-from httprunner.compat import ensure_path_sep
+from rrtv_httprunner.compat import ensure_path_sep
 from loguru import logger
 from sentry_sdk import capture_exception
 
-from httprunner.ext.har2case import utils
-from httprunner.make import make_testcase, format_pytest_with_black
+from rrtv_httprunner.ext.har2case import utils
+from rrtv_httprunner.make import make_testcase, format_pytest_with_black
 
 try:
     from json.decoder import JSONDecodeError
@@ -113,7 +113,7 @@ class HarParser(object):
                 {
                     "request": {
                         "headers": [
-                            {"name": "Host", "value": "httprunner.top"},
+                            {"name": "Host", "value": "rrtv_httprunner.top"},
                             {"name": "Content-Type", "value": "application/json"},
                             {"name": "User-Agent", "value": "iOS/10.3"}
                         ],

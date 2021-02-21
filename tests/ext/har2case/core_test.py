@@ -1,7 +1,7 @@
 import os
 
-from httprunner.ext.har2case.core import HarParser
-from httprunner.ext.har2case.utils import load_har_log_entries
+from rrtv_httprunner.ext.har2case.core import HarParser
+from rrtv_httprunner.ext.har2case.utils import load_har_log_entries
 from tests.ext.har2case.har_utils_test import TestHar2CaseUtils
 
 
@@ -48,7 +48,7 @@ class TestHar(TestHar2CaseUtils):
         os.remove(json_file)
 
     def test_filter(self):
-        filter_str = "httprunner"
+        filter_str = "rrtv_httprunner"
         har_parser = HarParser(self.har_path, filter_str)
         teststeps = har_parser._prepare_teststeps()
         self.assertEqual(
@@ -70,13 +70,13 @@ class TestHar(TestHar2CaseUtils):
             "https://httprunner.top/api/v1/Account/Login",
         )
 
-        exclude_str = "httprunner"
+        exclude_str = "rrtv_httprunner"
         har_parser = HarParser(self.har_path, exclude_str=exclude_str)
         teststeps = har_parser._prepare_teststeps()
         self.assertEqual(teststeps, [])
 
     def test_exclude_multiple(self):
-        exclude_str = "httprunner|v2"
+        exclude_str = "rrtv_httprunner|v2"
         har_parser = HarParser(self.har_path, exclude_str=exclude_str)
         teststeps = har_parser._prepare_teststeps()
         self.assertEqual(teststeps, [])

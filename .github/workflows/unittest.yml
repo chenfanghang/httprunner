@@ -31,7 +31,7 @@ jobs:
         pip install poetry
         poetry --version
         poetry install -vv
-    - name: Run unittest for httprunner
+    - name: Run unittest for rrtv_httprunner
       run: |
         poetry run httprunner
         poetry run hmake
@@ -46,7 +46,7 @@ jobs:
       uses: codecov/codecov-action@v1.0.5
       with:
         # User defined upload name. Visible in Codecov UI
-        name: httprunner
+        name: rrtv_httprunner
         # Repository upload token - get it from codecov.io
         token: ${{ secrets.CODECOV_TOKEN }}
         # Path to coverage file to upload

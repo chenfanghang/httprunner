@@ -161,7 +161,7 @@ teststeps:
     )
     demo_debugtalk_content = """import time
 
-from httprunner import __version__
+from rrtv_httprunner import __version__
 
 
 def get_httprunner_version():

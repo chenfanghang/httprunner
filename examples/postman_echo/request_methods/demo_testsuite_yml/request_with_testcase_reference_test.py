@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
-from httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
+from rrtv_httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
 
 from request_methods.request_with_functions_test import (
     TestCaseRequestWithFunctions as RequestWithFunctions,

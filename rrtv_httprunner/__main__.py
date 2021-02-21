@@ -1,4 +1,4 @@
-from httprunner.cli import main
+from rrtv_httprunner.cli import main
 
 
 if __name__ == "__main__":

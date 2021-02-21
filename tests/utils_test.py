@@ -3,8 +3,8 @@ import json
 import os
 import unittest
 
-from httprunner import loader, utils
-from httprunner.utils import (
+from rrtv_httprunner import loader, utils
+from rrtv_httprunner.utils import (
     ExtendJSONEncoder,
     merge_variables,
 )
@@ -19,7 +19,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(os.environ["abc"], "123")
 
     def test_validators(self):
-        from httprunner.builtin import comparators
+        from rrtv_httprunner.builtin import comparators
 
         functions_mapping = loader.load_module_functions(comparators)
 

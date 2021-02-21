@@ -12,9 +12,9 @@ from requests.exceptions import (
     RequestException,
 )
 
-from httprunner.models import RequestData, ResponseData
-from httprunner.models import SessionData, ReqRespData
-from httprunner.utils import lower_dict_keys, omit_long_data
+from rrtv_httprunner.models import RequestData, ResponseData
+from rrtv_httprunner.models import SessionData, ReqRespData
+from rrtv_httprunner.utils import lower_dict_keys, omit_long_data
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 

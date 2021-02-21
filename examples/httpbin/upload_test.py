@@ -2,7 +2,7 @@
 # FROM: upload.yml
 
 
-from httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
+from rrtv_httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
 
 
 class TestCaseUpload(HttpRunner):

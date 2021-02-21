@@ -5,10 +5,10 @@ import requests
 from jmespath.exceptions import JMESPathError
 from loguru import logger
 
-from httprunner import exceptions
-from httprunner.exceptions import ValidationFailure, ParamsError
-from httprunner.models import VariablesMapping, Validators, FunctionsMapping
-from httprunner.parser import parse_data, parse_string_value, get_mapping_function
+from rrtv_httprunner import exceptions
+from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
+from rrtv_httprunner.models import VariablesMapping, Validators, FunctionsMapping
+from rrtv_httprunner.parser import parse_data, parse_string_value, get_mapping_function
 
 
 def get_uniform_comparator(comparator: Text):
@@ -154,13 +154,14 @@ class ResponseObject(object):
         try:
             check_value = jmespath.search(expr, resp_obj_meta)
         except JMESPathError as ex:
-            logger.error(
-                f"failed to search with jmespath\n"
-                f"expression: {expr}\n"
-                f"data: {resp_obj_meta}\n"
-                f"exception: {ex}"
-            )
-            raise
+            check_value = parse_string_value(expr)
+            # logger.error(
+            #     f"failed to search with jmespath\n"
+            #     f"expression: {expr}\n"
+            #     f"data: {resp_obj_meta}\n"
+            #     f"exception: {ex}"
+            # )
+            # raise
 
         return check_value
 
@@ -177,10 +178,10 @@ class ResponseObject(object):
         return extract_mapping
 
     def validate(
-        self,
-        validators: Validators,
-        variables_mapping: VariablesMapping = None,
-        functions_mapping: FunctionsMapping = None,
+            self,
+            validators: Validators,
+            variables_mapping: VariablesMapping = None,
+            functions_mapping: FunctionsMapping = None,
     ) -> NoReturn:
 
         variables_mapping = variables_mapping or {}
@@ -202,12 +203,13 @@ class ResponseObject(object):
 
             # check item
             check_item = u_validator["check"]
-            if "$" in check_item:
-                # check_item is variable or function
-                check_item = parse_data(
-                    check_item, variables_mapping, functions_mapping
-                )
-                check_item = parse_string_value(check_item)
+            if isinstance(check_item, str):
+                if "$" in check_item:
+                    # check_item is variable or function
+                    check_item = parse_data(
+                        check_item, variables_mapping, functions_mapping
+                    )
+                    check_item = parse_string_value(check_item)
 
             if check_item and isinstance(check_item, Text):
                 check_value = self._search_jmespath(check_item)

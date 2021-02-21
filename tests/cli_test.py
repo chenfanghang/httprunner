@@ -5,7 +5,7 @@ import unittest
 
 import pytest
 
-from httprunner.cli import main
+from rrtv_httprunner.cli import main
 
 
 class TestCli(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestCli(unittest.TestCase):
 
         self.assertEqual(cm.exception.code, 0)
 
-        from httprunner import __version__
+        from rrtv_httprunner import __version__
 
         self.assertIn(__version__, self.captured_output.getvalue().strip())
 
@@ -36,7 +36,7 @@ class TestCli(unittest.TestCase):
 
         self.assertEqual(cm.exception.code, 0)
 
-        from httprunner import __description__
+        from rrtv_httprunner import __description__
 
         self.assertIn(__description__, self.captured_output.getvalue().strip())
 

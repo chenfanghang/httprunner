@@ -3,7 +3,7 @@ import shutil
 import subprocess
 import unittest
 
-from httprunner.scaffold import create_scaffold
+from rrtv_httprunner.scaffold import create_scaffold
 
 
 class TestScaffold(unittest.TestCase):
