@@ -21,12 +21,12 @@ class TestCaseValidate(HttpRunner):
         # ),
         Step(
             RunRequest("validate response with python script")
-            .with_variables(**{"test": 1})
+            .with_variables(**{"test": "a"})
             .get("/get")
             .with_params(**{"a": 1, "b": 2})
             .validate()
             .assert_equal("status_code", 200)
-            .assert_string_equals(2, 1)
+            .assert_string_equals("$test", "b")
         ),
     ]
 

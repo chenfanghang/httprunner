@@ -153,6 +153,8 @@ class ResponseObject(object):
         }
         try:
             check_value = jmespath.search(expr, resp_obj_meta)
+            if check_value is None:
+                check_value = parse_string_value(expr)
         except JMESPathError as ex:
             check_value = parse_string_value(expr)
             # logger.error(
