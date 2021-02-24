@@ -18,7 +18,7 @@ from rrtv_httprunner.client import HttpSession
 from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
 from rrtv_httprunner.ext.uploader import prepare_upload_step
 from rrtv_httprunner.loader import load_project_meta, load_testcase_file
-from rrtv_httprunner.parser import build_url, parse_data, parse_variables_mapping
+from rrtv_httprunner.parser import build_url, parse_data, parse_variables_mapping, is_sql, parse_sql
 from rrtv_httprunner.response import ResponseObject
 from rrtv_httprunner.testcase import Config, Step
 from rrtv_httprunner.utils import merge_variables
@@ -89,7 +89,7 @@ class HttpRunner(object):
         return self
 
     def __call_hooks(
-        self, hooks: Hooks, step_variables: VariablesMapping, hook_msg: Text,
+            self, hooks: Hooks, step_variables: VariablesMapping, hook_msg: Text,
     ) -> NoReturn:
         """ call hook actions.
 
@@ -171,6 +171,27 @@ class HttpRunner(object):
         if step.teardown_hooks:
             self.__call_hooks(step.teardown_hooks, step.variables, "teardown request")
 
+        # for v in step.variables:
+        #     print(v)
+        db = ["mysql", "redis", "mongodb"]
+        # for d in db:
+        #     if d in step.variables:
+
+        # if db in step.variables:
+        has_db_attr = False
+        for d in db:
+            if d in step.variables:
+                has_db_attr = True
+                break
+        if has_db_attr is True:
+            if step.extra:
+                print("12312321")
+                for s in step.extra:
+                    if is_sql(s) is True:
+                        print("123")
+                        parse_sql(step.variables["mysql"], s)
+
+
         def log_req_resp_details():
             err_msg = "\n{} DETAILED REQUEST & RESPONSE {}\n".format("*" * 32, "*" * 32)
 
@@ -244,11 +265,11 @@ class HttpRunner(object):
             testcase_cls = step.testcase
             case_result = (
                 testcase_cls()
-                .with_session(self.__session)
-                .with_case_id(self.__case_id)
-                .with_variables(step_variables)
-                .with_export(step_export)
-                .run()
+                    .with_session(self.__session)
+                    .with_case_id(self.__case_id)
+                    .with_variables(step_variables)
+                    .with_export(step_export)
+                    .run()
             )
 
         elif isinstance(step.testcase, Text):
@@ -261,11 +282,11 @@ class HttpRunner(object):
 
             case_result = (
                 HttpRunner()
-                .with_session(self.__session)
-                .with_case_id(self.__case_id)
-                .with_variables(step_variables)
-                .with_export(step_export)
-                .run_path(ref_testcase_path)
+                    .with_session(self.__session)
+                    .with_case_id(self.__case_id)
+                    .with_variables(step_variables)
+                    .with_export(step_export)
+                    .run_path(ref_testcase_path)
             )
 
         else:
@@ -345,6 +366,7 @@ class HttpRunner(object):
             step.variables = merge_variables(step.variables, extracted_variables)
             # step variables > testcase config variables
             step.variables = merge_variables(step.variables, self.__config.variables)
+            step.variables = merge_variables(step.variables, self.__config.db)
 
             # parse variables
             step.variables = parse_variables_mapping(
@@ -458,3 +480,13 @@ class HttpRunner(object):
         finally:
             logger.remove(log_handler)
             logger.info(f"generate testcase log: {self.__log_path}")
+
+
+if __name__ == '__main__':
+    list_a = ["a", "b"]
+    dict_b = {"a": "1", "b": "2", "c": "3", "d": "4"}
+    for l in list_a:
+        if l in dict_b:
+            print(l in dict_b)
+            break
+

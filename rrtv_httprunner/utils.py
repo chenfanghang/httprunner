@@ -1,12 +1,12 @@
 import collections
 import copy
+import itertools
 import json
 import os.path
 import platform
 import uuid
 from multiprocessing import Queue
-import itertools
-from typing import Dict, List, Any, Union, Text
+from typing import Dict, List, Any, Text
 
 import sentry_sdk
 from loguru import logger
@@ -14,6 +14,7 @@ from loguru import logger
 from rrtv_httprunner import __version__
 from rrtv_httprunner import exceptions
 from rrtv_httprunner.models import VariablesMapping
+from rrtv_httprunner.mysqls import DBHandler
 
 
 def init_sentry_sdk():
@@ -194,7 +195,7 @@ class ExtendJSONEncoder(json.JSONEncoder):
 
 
 def merge_variables(
-    variables: VariablesMapping, variables_to_be_overridden: VariablesMapping
+        variables: VariablesMapping, variables_to_be_overridden: VariablesMapping
 ) -> VariablesMapping:
     """ merge two variables mapping, the first variables have higher priority
     """
@@ -260,3 +261,22 @@ def gen_cartesian_product(*args: List[Dict]) -> List[Dict]:
         product_list.append(product_item_dict)
 
     return product_list
+
+
+def is_sql(sql: Text) -> bool:
+    if isinstance(sql, str):
+        if sql.startswith("sql:"):
+            return True
+        else:
+            return False
+
+
+def execute_sql(db: DBHandler, sql: Text) -> Text:
+    if sql.startswith("select"):
+        return db.query(sql, one=True)
+    elif sql.startswith("insert"):
+        return db.query(sql, one=True)
+    elif sql.startswith("update"):
+        return db.query(sql, one=True)
+    elif sql.startswith("delete"):
+        return db.delete(sql)

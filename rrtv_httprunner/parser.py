@@ -1,14 +1,16 @@
 import ast
 import builtins
-import re
 import os
-from typing import Any, Set, Text, Callable, List, Dict, Union
+import re
+from typing import Any, Set, Text, Callable, List, Dict
 
 from loguru import logger
 from sentry_sdk import capture_exception
 
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
+from rrtv_httprunner.mysqls import DBHandler
+from rrtv_httprunner.utils import execute_sql, is_sql
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -18,6 +20,7 @@ dolloar_regex_compile = re.compile(r"\$\$")
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
 function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\.\-/\s=,]*)\)\}")
+suffix = ""
 
 
 def parse_string_value(str_value: Text) -> Any:
@@ -209,7 +212,7 @@ def parse_function_params(params: Text) -> Dict:
 
 
 def get_mapping_variable(
-    variable_name: Text, variables_mapping: VariablesMapping
+        variable_name: Text, variables_mapping: VariablesMapping
 ) -> Any:
     """ get variable from variables_mapping.
 
@@ -234,7 +237,7 @@ def get_mapping_variable(
 
 
 def get_mapping_function(
-    function_name: Text, functions_mapping: FunctionsMapping
+        function_name: Text, functions_mapping: FunctionsMapping
 ) -> Callable:
     """ get function from functions_mapping,
         if not found, then try to check if builtin function.
@@ -282,9 +285,9 @@ def get_mapping_function(
 
 
 def parse_string(
-    raw_string: Text,
-    variables_mapping: VariablesMapping,
-    functions_mapping: FunctionsMapping,
+        raw_string: Text,
+        variables_mapping: VariablesMapping,
+        functions_mapping: FunctionsMapping,
 ) -> Any:
     """ parse string content with variables and functions mapping.
 
@@ -363,7 +366,10 @@ def parse_string(
         if var_match:
             var_name = var_match.group(1) or var_match.group(2)
             var_value = get_mapping_variable(var_name, variables_mapping)
-
+            global suffix
+            suffix = re.findall(r'\[\'(.*?)\'\]', raw_string)
+            if suffix:
+                suffix = suffix[0]
             if f"${var_name}" == raw_string or "${" + var_name + "}" == raw_string:
                 # raw_string is a variable, $var or ${var}, return its value directly
                 return var_value
@@ -384,14 +390,13 @@ def parse_string(
             match_start_position = len(raw_string)
 
         parsed_string += remain_string
-
     return parsed_string
 
 
 def parse_data(
-    raw_data: Any,
-    variables_mapping: VariablesMapping = None,
-    functions_mapping: FunctionsMapping = None,
+        raw_data: Any,
+        variables_mapping: VariablesMapping = None,
+        functions_mapping: FunctionsMapping = None,
 ) -> Any:
     """ parse raw data with evaluated variables mapping.
         Notice: variables_mapping should not contain any variable or function.
@@ -402,7 +407,16 @@ def parse_data(
         functions_mapping = functions_mapping or {}
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
-        return parse_string(raw_data, variables_mapping, functions_mapping)
+        var_value = parse_string_value(parse_string(raw_data, variables_mapping, functions_mapping))
+        if is_sql(var_value) is True:
+            try:
+                return parse_sql(variables_mapping["mysql"], var_value)[suffix]
+            except TypeError:
+                return parse_sql(variables_mapping["mysql"], var_value)
+            except KeyError:
+                return parse_sql(variables_mapping["mysql"], var_value)
+        else:
+            return var_value
 
     elif isinstance(raw_data, (list, set, tuple)):
         return [
@@ -424,9 +438,8 @@ def parse_data(
 
 
 def parse_variables_mapping(
-    variables_mapping: VariablesMapping, functions_mapping: FunctionsMapping = None
+        variables_mapping: VariablesMapping, functions_mapping: FunctionsMapping = None
 ) -> VariablesMapping:
-
     parsed_variables: VariablesMapping = {}
 
     while len(parsed_variables) != len(variables_mapping):
@@ -466,7 +479,7 @@ def parse_variables_mapping(
     return parsed_variables
 
 
-def parse_parameters(parameters: Dict,) -> List[Dict]:
+def parse_parameters(parameters: Dict, ) -> List[Dict]:
     """ parse parameters and generate cartesian product.
 
     Args:
@@ -571,3 +584,14 @@ def parse_parameters(parameters: Dict,) -> List[Dict]:
         parsed_parameters_list.append(parameter_content_list)
 
     return utils.gen_cartesian_product(*parsed_parameters_list)
+
+
+def parse_sql(db: dict, sql: Text) -> Text:
+    split_sql = sql.split(":")[1].split(";")[0] + ";"
+    try:
+        db = DBHandler(db)
+        logger.debug("execute sql: {" + split_sql + "}")
+        return execute_sql(db, split_sql)
+    except KeyError:
+        logger.warning("database parameter missing")
+        return split_sql

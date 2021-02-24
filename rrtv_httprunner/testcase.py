@@ -18,7 +18,7 @@ class Config(object):
         self.__verify = False
         self.__export = []
         self.__weight = 1
-
+        self.__db = {}
         caller_frame = inspect.stack()[1]
         self.__path = caller_frame.filename
 
@@ -54,6 +54,11 @@ class Config(object):
         self.__weight = weight
         return self
 
+    def db(self, **db) -> "Config":
+        # self.__db = db
+        self.__db.update(db)
+        return self
+
     def perform(self) -> TConfig:
         return TConfig(
             name=self.__name,
@@ -63,6 +68,7 @@ class Config(object):
             export=list(set(self.__export)),
             path=self.__path,
             weight=self.__weight,
+            db=self.__db
         )
 
 
@@ -71,7 +77,7 @@ class StepRequestValidation(object):
         self.__step_context = step_context
 
     def assert_equal(
-        self, jmes_path: Text, expected_value: Any, message: Text = ""
+            self, jmes_path: Text, expected_value: Any, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"equal": [jmes_path, expected_value, message]}
@@ -79,7 +85,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_not_equal(
-        self, jmes_path: Text, expected_value: Any, message: Text = ""
+            self, jmes_path: Text, expected_value: Any, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"not_equal": [jmes_path, expected_value, message]}
@@ -87,7 +93,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_greater_than(
-        self, jmes_path: Text, expected_value: Union[int, float], message: Text = ""
+            self, jmes_path: Text, expected_value: Union[int, float], message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"greater_than": [jmes_path, expected_value, message]}
@@ -95,7 +101,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_less_than(
-        self, jmes_path: Text, expected_value: Union[int, float], message: Text = ""
+            self, jmes_path: Text, expected_value: Union[int, float], message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"less_than": [jmes_path, expected_value, message]}
@@ -103,7 +109,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_greater_or_equals(
-        self, jmes_path: Text, expected_value: Union[int, float], message: Text = ""
+            self, jmes_path: Text, expected_value: Union[int, float], message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"greater_or_equals": [jmes_path, expected_value, message]}
@@ -111,7 +117,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_less_or_equals(
-        self, jmes_path: Text, expected_value: Union[int, float], message: Text = ""
+            self, jmes_path: Text, expected_value: Union[int, float], message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"less_or_equals": [jmes_path, expected_value, message]}
@@ -119,7 +125,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_length_equal(
-        self, jmes_path: Text, expected_value: int, message: Text = ""
+            self, jmes_path: Text, expected_value: int, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"length_equal": [jmes_path, expected_value, message]}
@@ -127,7 +133,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_length_greater_than(
-        self, jmes_path: Text, expected_value: int, message: Text = ""
+            self, jmes_path: Text, expected_value: int, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"length_greater_than": [jmes_path, expected_value, message]}
@@ -135,7 +141,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_length_less_than(
-        self, jmes_path: Text, expected_value: int, message: Text = ""
+            self, jmes_path: Text, expected_value: int, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"length_less_than": [jmes_path, expected_value, message]}
@@ -143,7 +149,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_length_greater_or_equals(
-        self, jmes_path: Text, expected_value: int, message: Text = ""
+            self, jmes_path: Text, expected_value: int, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"length_greater_or_equals": [jmes_path, expected_value, message]}
@@ -151,7 +157,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_length_less_or_equals(
-        self, jmes_path: Text, expected_value: int, message: Text = ""
+            self, jmes_path: Text, expected_value: int, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"length_less_or_equals": [jmes_path, expected_value, message]}
@@ -159,7 +165,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_string_equals(
-        self, jmes_path: Text, expected_value: Any, message: Text = ""
+            self, jmes_path: Text, expected_value: Any, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"string_equals": [jmes_path, expected_value, message]}
@@ -167,7 +173,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_startswith(
-        self, jmes_path: Text, expected_value: Text, message: Text = ""
+            self, jmes_path: Text, expected_value: Text, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"startswith": [jmes_path, expected_value, message]}
@@ -175,7 +181,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_endswith(
-        self, jmes_path: Text, expected_value: Text, message: Text = ""
+            self, jmes_path: Text, expected_value: Text, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"endswith": [jmes_path, expected_value, message]}
@@ -183,7 +189,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_regex_match(
-        self, jmes_path: Text, expected_value: Text, message: Text = ""
+            self, jmes_path: Text, expected_value: Text, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"regex_match": [jmes_path, expected_value, message]}
@@ -191,7 +197,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_contains(
-        self, jmes_path: Text, expected_value: Any, message: Text = ""
+            self, jmes_path: Text, expected_value: Any, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"contains": [jmes_path, expected_value, message]}
@@ -199,7 +205,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_contained_by(
-        self, jmes_path: Text, expected_value: Any, message: Text = ""
+            self, jmes_path: Text, expected_value: Any, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"contained_by": [jmes_path, expected_value, message]}
@@ -207,7 +213,7 @@ class StepRequestValidation(object):
         return self
 
     def assert_type_match(
-        self, jmes_path: Text, expected_value: Any, message: Text = ""
+            self, jmes_path: Text, expected_value: Any, message: Text = ""
     ) -> "StepRequestValidation":
         self.__step_context.validators.append(
             {"type_match": [jmes_path, expected_value, message]}
@@ -226,6 +232,10 @@ class StepRequestExtraction(object):
         self.__step_context.extract[var_name] = jmes_path
         return self
 
+    def with_sql(self, var_name: Text, sql: Text) -> "StepRequestExtraction":
+        self.__step_context.extract[var_name] = sql
+        return self
+
     # def with_regex(self):
     #     # TODO: extract response html with regex
     #     pass
@@ -236,6 +246,9 @@ class StepRequestExtraction(object):
 
     def validate(self) -> StepRequestValidation:
         return StepRequestValidation(self.__step_context)
+
+    def remote(self) -> "StepRequestExtra":
+        return StepRequestExtra(self.__step_context)
 
     def perform(self) -> TStep:
         return self.__step_context
@@ -282,7 +295,7 @@ class RequestWithOptionalArgs(object):
         return self
 
     def teardown_hook(
-        self, hook: Text, assign_var_name: Text = None
+            self, hook: Text, assign_var_name: Text = None
     ) -> "RequestWithOptionalArgs":
         if assign_var_name:
             self.__step_context.teardown_hooks.append({assign_var_name: hook})
@@ -299,6 +312,24 @@ class RequestWithOptionalArgs(object):
 
     def perform(self) -> TStep:
         return self.__step_context
+
+
+class StepRequestExtra(object):
+    def __init__(self, step_context: TStep):
+        self.__step_context = step_context
+
+    def execute(self, command) -> "StepRequestExtraction":
+        # self.__step_context.validators.append(
+        #     {"equal": [jmes_path, expected_value, message]}
+        # )
+        self.__step_context.extra.append(command)
+        return self
+        # return StepRequestValidation(self.__step_context)
+
+    def validate(self) -> StepRequestValidation:
+        return StepRequestValidation(self.__step_context)
+    # def execute(self) -> StepRequestExtraction:
+    #     return StepRequestValidation(self.__step_context)
 
 
 class RunRequest(object):
@@ -392,14 +423,15 @@ class RunTestCase(object):
 
 class Step(object):
     def __init__(
-        self,
-        step_context: Union[
-            StepRequestValidation,
-            StepRequestExtraction,
-            RequestWithOptionalArgs,
-            RunTestCase,
-            StepRefCase,
-        ],
+            self,
+            step_context: Union[
+                StepRequestValidation,
+                StepRequestExtraction,
+                StepRequestExtra,
+                RequestWithOptionalArgs,
+                RunTestCase,
+                StepRefCase,
+            ],
     ):
         self.__step_context = step_context.perform()
 

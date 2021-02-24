@@ -19,6 +19,7 @@ Hooks = List[Union[Text, Dict[Text, Text]]]
 Export = List[Text]
 Validators = List[Dict]
 Env = Dict[Text, Any]
+Extra = List[Text]
 
 
 class MethodEnum(Text, Enum):
@@ -43,6 +44,7 @@ class TConfig(BaseModel):
     export: Export = []
     path: Text = None
     weight: int = 1
+    db: Union[VariablesMapping, Text] = {}
 
 
 class TRequest(BaseModel):
@@ -74,6 +76,7 @@ class TStep(BaseModel):
     export: Export = []
     validators: Validators = Field([], alias="validate")
     validate_script: List[Text] = []
+    extra: Extra = []
 
 
 class TestCase(BaseModel):
