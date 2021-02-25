@@ -89,5 +89,8 @@ class SummaryEmpty(MyBaseError):
     """
 
 
-class DBError(MyBaseError):
+class DBError(KeyError):
+    pass
+
+class StatementNonSupportError(MyBaseError):
     pass

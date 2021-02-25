@@ -6,7 +6,7 @@ import os.path
 import platform
 import uuid
 from multiprocessing import Queue
-from typing import Dict, List, Any, Text
+from typing import Dict, List, Any, Text,NoReturn
 
 import sentry_sdk
 from loguru import logger
@@ -263,20 +263,32 @@ def gen_cartesian_product(*args: List[Dict]) -> List[Dict]:
     return product_list
 
 
-def is_sql(sql: Text) -> bool:
-    if isinstance(sql, str):
-        if sql.startswith("sql:"):
-            return True
-        else:
-            return False
+def get_statement_type(statement: Text) -> Text:
+    if isinstance(statement, str):
+        if statement.startswith("sql:"):
+            return "sql"
+        elif statement.startswith("redis:"):
+            return "redis"
+        elif statement.startswith("mongo:"):
+            return "mongo"
+        elif statement.startswith("cmd:"):
+            return "cmd"
 
 
 def execute_sql(db: DBHandler, sql: Text) -> Text:
+    parser_sql = sql.split(":")[1].split(";")[0] + ";"
+    db = DBHandler(db)
+    logger.info("execute sql: {" + parser_sql + "}")
     if sql.startswith("select"):
-        return db.query(sql, one=True)
+        return db.query(parser_sql, one=True)
     elif sql.startswith("insert"):
-        return db.query(sql, one=True)
+        return db.query(parser_sql, one=True)
     elif sql.startswith("update"):
-        return db.query(sql, one=True)
+        return db.query(parser_sql, one=True)
     elif sql.startswith("delete"):
-        return db.delete(sql)
+        return db.delete(parser_sql)
+
+def execute_cmd(cmd: Text) -> NoReturn:
+    parser_cmd = cmd.split(":")[1]
+    logger.info("execute cmd: {" + parser_cmd + "}")
+    os.system(parser_cmd)

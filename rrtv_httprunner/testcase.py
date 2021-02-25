@@ -232,8 +232,9 @@ class StepRequestExtraction(object):
         self.__step_context.extract[var_name] = jmes_path
         return self
 
-    def with_sql(self, var_name: Text, sql: Text) -> "StepRequestExtraction":
-        self.__step_context.extract[var_name] = sql
+    def with_extra(self, var_name: Text, sql: Text) -> "StepRequestExtraction":
+        # self.__step_context.extract[var_name] = sql
+        self.__step_context.extra[var_name]=sql
         return self
 
     # def with_regex(self):
@@ -246,9 +247,6 @@ class StepRequestExtraction(object):
 
     def validate(self) -> StepRequestValidation:
         return StepRequestValidation(self.__step_context)
-
-    def remote(self) -> "StepRequestExtra":
-        return StepRequestExtra(self.__step_context)
 
     def perform(self) -> TStep:
         return self.__step_context
@@ -304,6 +302,10 @@ class RequestWithOptionalArgs(object):
 
         return self
 
+    def teardown_exec(self, command) -> "RequestWithOptionalArgs":
+        self.__step_context.teardown.append(command)
+        return self
+
     def extract(self) -> StepRequestExtraction:
         return StepRequestExtraction(self.__step_context)
 
@@ -314,30 +316,20 @@ class RequestWithOptionalArgs(object):
         return self.__step_context
 
 
-class StepRequestExtra(object):
-    def __init__(self, step_context: TStep):
-        self.__step_context = step_context
-
-    def execute(self, command) -> "StepRequestExtraction":
-        # self.__step_context.validators.append(
-        #     {"equal": [jmes_path, expected_value, message]}
-        # )
-        self.__step_context.extra.append(command)
-        return self
-        # return StepRequestValidation(self.__step_context)
-
-    def validate(self) -> StepRequestValidation:
-        return StepRequestValidation(self.__step_context)
-    # def execute(self) -> StepRequestExtraction:
-    #     return StepRequestValidation(self.__step_context)
-
-
 class RunRequest(object):
     def __init__(self, name: Text):
         self.__step_context = TStep(name=name)
 
     def with_variables(self, **variables) -> "RunRequest":
         self.__step_context.variables.update(variables)
+        return self
+
+    # def setup_exec(self, **variables) -> "RunRequest":
+    #     self.__step_context.variables.update(variables)
+    #     return self
+
+    def setup_exec(self, command) -> "RunRequest":
+        self.__step_context.setup.append(command)
         return self
 
     def setup_hook(self, hook: Text, assign_var_name: Text = None) -> "RunRequest":
@@ -427,7 +419,6 @@ class Step(object):
             step_context: Union[
                 StepRequestValidation,
                 StepRequestExtraction,
-                StepRequestExtra,
                 RequestWithOptionalArgs,
                 RunTestCase,
                 StepRefCase,

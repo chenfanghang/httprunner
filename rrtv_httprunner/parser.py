@@ -5,12 +5,11 @@ import re
 from typing import Any, Set, Text, Callable, List, Dict
 
 from loguru import logger
-from sentry_sdk import capture_exception
-
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
 from rrtv_httprunner.mysqls import DBHandler
-from rrtv_httprunner.utils import execute_sql, is_sql
+from rrtv_httprunner.utils import execute_sql,execute_cmd, get_statement_type
+from sentry_sdk import capture_exception
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -407,14 +406,17 @@ def parse_data(
         functions_mapping = functions_mapping or {}
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
-        var_value = parse_string_value(parse_string(raw_data, variables_mapping, functions_mapping))
-        if is_sql(var_value) is True:
+        var_value = parse_string(raw_data, variables_mapping, functions_mapping)
+        if get_statement_type(var_value) == "sql":
             try:
-                return parse_sql(variables_mapping["mysql"], var_value)[suffix]
-            except TypeError:
-                return parse_sql(variables_mapping["mysql"], var_value)
-            except KeyError:
-                return parse_sql(variables_mapping["mysql"], var_value)
+                value = execute_sql(variables_mapping["mysql"], var_value)
+                if value is None:  # 如果为None说明非select方法
+                    return var_value  # 直接返回原字符串
+                return execute_sql(variables_mapping["mysql"], var_value)[suffix]
+            except KeyError:  # 没有suffix后缀
+                return execute_sql(variables_mapping["mysql"], var_value)
+        elif get_statement_type(var_value) == "cmd":
+            execute_cmd(var_value)
         else:
             return var_value
 
@@ -584,14 +586,3 @@ def parse_parameters(parameters: Dict, ) -> List[Dict]:
         parsed_parameters_list.append(parameter_content_list)
 
     return utils.gen_cartesian_product(*parsed_parameters_list)
-
-
-def parse_sql(db: dict, sql: Text) -> Text:
-    split_sql = sql.split(":")[1].split(";")[0] + ";"
-    try:
-        db = DBHandler(db)
-        logger.debug("execute sql: {" + split_sql + "}")
-        return execute_sql(db, split_sql)
-    except KeyError:
-        logger.warning("database parameter missing")
-        return split_sql

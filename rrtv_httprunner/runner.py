@@ -18,7 +18,7 @@ from rrtv_httprunner.client import HttpSession
 from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
 from rrtv_httprunner.ext.uploader import prepare_upload_step
 from rrtv_httprunner.loader import load_project_meta, load_testcase_file
-from rrtv_httprunner.parser import build_url, parse_data, parse_variables_mapping, is_sql, parse_sql
+from rrtv_httprunner.parser import build_url, parse_data, parse_variables_mapping
 from rrtv_httprunner.response import ResponseObject
 from rrtv_httprunner.testcase import Config, Step
 from rrtv_httprunner.utils import merge_variables
@@ -134,6 +134,31 @@ class HttpRunner(object):
             else:
                 logger.error(f"Invalid hook format: {hook}")
 
+    def __execute(self, aspect: Text, step: TStep, variables_mapping=None,
+                  functions_mapping=None, ) -> NoReturn:
+        db = ["mysql", "redis", "mongodb","cmd"]
+        has_db_attr = False
+        for d in db:  # 判断是否有数据源
+            if d in step.variables:
+                has_db_attr = True
+                break
+
+        if has_db_attr is True:
+            if aspect == "setup":
+                if step.setup:
+                    logger.info("setup begin execute >>>>>>")
+                    for s in step.setup:
+                        parse_data(
+                            s, variables_mapping, functions_mapping
+                        )
+            elif aspect == "teardown":
+                if step.teardown:
+                    logger.info("teardown begin execute >>>>>>")
+                    for s in step.teardown:
+                        parse_data(
+                            s, variables_mapping, functions_mapping
+                        )
+
     def __run_step_request(self, step: TStep) -> StepData:
         """run teststep: request"""
         step_data = StepData(name=step.name)
@@ -155,6 +180,11 @@ class HttpRunner(object):
         if step.setup_hooks:
             self.__call_hooks(step.setup_hooks, step.variables, "setup request")
 
+        variables_mapping = step.variables
+        # variables_mapping.update(extract_mapping)
+        # 执行setup
+        self.__execute("setup", step, variables_mapping, self.__project_meta.functions)
+
         # prepare arguments
         method = parsed_request_dict.pop("method")
         url_path = parsed_request_dict.pop("url")
@@ -170,27 +200,6 @@ class HttpRunner(object):
         # teardown hooks
         if step.teardown_hooks:
             self.__call_hooks(step.teardown_hooks, step.variables, "teardown request")
-
-        # for v in step.variables:
-        #     print(v)
-        db = ["mysql", "redis", "mongodb"]
-        # for d in db:
-        #     if d in step.variables:
-
-        # if db in step.variables:
-        has_db_attr = False
-        for d in db:
-            if d in step.variables:
-                has_db_attr = True
-                break
-        if has_db_attr is True:
-            if step.extra:
-                print("12312321")
-                for s in step.extra:
-                    if is_sql(s) is True:
-                        print("123")
-                        parse_sql(step.variables["mysql"], s)
-
 
         def log_req_resp_details():
             err_msg = "\n{} DETAILED REQUEST & RESPONSE {}\n".format("*" * 32, "*" * 32)
@@ -221,7 +230,8 @@ class HttpRunner(object):
 
         variables_mapping = step.variables
         variables_mapping.update(extract_mapping)
-
+        # 执行teardown
+        self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
         # validate
         validators = step.validators
         session_success = False
@@ -367,6 +377,7 @@ class HttpRunner(object):
             # step variables > testcase config variables
             step.variables = merge_variables(step.variables, self.__config.variables)
             step.variables = merge_variables(step.variables, self.__config.db)
+            # step.variables = merge_variables(step.variables, step.extra)
 
             # parse variables
             step.variables = parse_variables_mapping(
@@ -489,4 +500,3 @@ if __name__ == '__main__':
         if l in dict_b:
             print(l in dict_b)
             break
-

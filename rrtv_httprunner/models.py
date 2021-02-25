@@ -20,6 +20,8 @@ Export = List[Text]
 Validators = List[Dict]
 Env = Dict[Text, Any]
 Extra = List[Text]
+SetUp = List[Text]
+TearDown = List[Text]
 
 
 class MethodEnum(Text, Enum):
@@ -76,7 +78,9 @@ class TStep(BaseModel):
     export: Export = []
     validators: Validators = Field([], alias="validate")
     validate_script: List[Text] = []
-    extra: Extra = []
+    extra: VariablesMapping = {}
+    setup: SetUp = []
+    teardown: TearDown = []
 
 
 class TestCase(BaseModel):
