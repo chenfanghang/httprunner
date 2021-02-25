@@ -10,16 +10,7 @@ class DBHandler(object):
 
     # 也可以继承 Connection 这里没有选择继承
     def __init__(self, _db: dict, **kwargs):
-        # _db = ""
-        # content = read_db_yaml()
-        # switch = read_env_yaml()
-        # res = jsonpath.jsonpath(content, f"$.{db_key}")[0]
-        # all_switch = jsonpath.jsonpath(switch, "$.all.switch")[0]
-        # all_env = jsonpath.jsonpath(switch, "$.all.env")[0]
-        # if all_switch == "false":
-        #     _db = res[res["default"]]
-        # else:
-        #     _db = res[all_env]
+        _db = eval(_db)
         self.connect = pymysql.connect(
             host=str(_db["host"]),  # 连接名
             port=int(_db["port"]),  # 端口

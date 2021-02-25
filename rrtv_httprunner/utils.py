@@ -279,13 +279,13 @@ def execute_sql(db: DBHandler, sql: Text) -> Text:
     parser_sql = sql.split(":")[1].split(";")[0] + ";"
     db = DBHandler(db)
     logger.info("execute sql: {" + parser_sql + "}")
-    if sql.startswith("select"):
+    if parser_sql.startswith("select"):
         return db.query(parser_sql, one=True)
-    elif sql.startswith("insert"):
+    elif parser_sql.startswith("insert"):
         return db.query(parser_sql, one=True)
-    elif sql.startswith("update"):
+    elif parser_sql.startswith("update"):
         return db.query(parser_sql, one=True)
-    elif sql.startswith("delete"):
+    elif parser_sql.startswith("delete"):
         return db.delete(parser_sql)
 
 def execute_cmd(cmd: Text) -> NoReturn:
