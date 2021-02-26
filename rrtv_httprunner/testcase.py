@@ -236,6 +236,18 @@ class StepRequestExtraction(object):
         self.__step_context.extract[var_name] = extra
         return self
 
+    def with_sql(self, sql: Text, var_name: Text) -> "StepRequestExtraction":
+        self.__step_context.extract[var_name] = "sql:"+sql
+        return self
+
+    def with_redis(self, redis: Text, var_name: Text) -> "StepRequestExtraction":
+        self.__step_context.extract[var_name] = "redis:"+redis
+        return self
+
+    def with_mongo(self, mongo: Text, var_name: Text) -> "StepRequestExtraction":
+        self.__step_context.extract[var_name] = "mongo:"+mongo
+        return self
+
     # def with_regex(self):
     #     # TODO: extract response html with regex
     #     pass

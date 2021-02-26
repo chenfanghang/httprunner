@@ -136,22 +136,34 @@ class HttpRunner(object):
 
     def __execute(self, aspect: Text, step: TStep, variables_mapping=None,
                   functions_mapping=None, ) -> NoReturn:
-        db = ["mysql", "redis", "mongodb", "cmd"]
-        has_db_attr = False
-        for d in db:  # 判断是否有数据源
-            if d in step.variables:
-                has_db_attr = True
+        need_configured_attr = ["mysql", "redis", "mongodb"]
+        not_need_configured_attr = ["cmd"]
+        has_attr = False
+        for attr in need_configured_attr:  # 判断是否有数据源
+            if attr in step.variables:
+                has_attr = True
                 break
 
-        if has_db_attr is True:
-            if aspect == "setup":
+        if aspect == "setup":
+            for attr in not_need_configured_attr:  # 判断是否有数据源
+                for setup in step.setup:
+                    if attr in setup:
+                        has_attr = True
+                        break
+            if has_attr is True:
                 if step.setup:
                     logger.info("setup begin execute >>>>>>")
                     for s in step.setup:
                         parse_data(
                             s, variables_mapping, functions_mapping
                         )
-            elif aspect == "teardown":
+        elif aspect == "teardown":
+            for attr in not_need_configured_attr:  # 判断是否有数据源
+                for teardown in step.teardown:
+                    if attr in teardown:
+                        has_attr = True
+                        break
+            if has_attr is True:
                 if step.teardown:
                     logger.info("teardown begin execute >>>>>>")
                     for s in step.teardown:
@@ -183,7 +195,8 @@ class HttpRunner(object):
         variables_mapping = step.variables
         # variables_mapping.update(extract_mapping)
         # execute setup
-        self.__execute("setup", step, variables_mapping, self.__project_meta.functions)
+        if step.setup:
+            self.__execute("setup", step, variables_mapping, self.__project_meta.functions)
 
         # prepare arguments
         method = parsed_request_dict.pop("method")
@@ -225,13 +238,15 @@ class HttpRunner(object):
 
         # extract
         extractors = step.extract
-        extract_mapping = resp_obj.extract(extractors,variables_mapping,self.__project_meta.functions)
+        extract_mapping = resp_obj.extract(extractors, variables_mapping, self.__project_meta.functions)
         step_data.export_vars = extract_mapping
 
         variables_mapping = step.variables
         variables_mapping.update(extract_mapping)
         # 执行teardown
-        self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
+        if step.teardown:
+            self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
+
         # validate
         validators = step.validators
         session_success = False
