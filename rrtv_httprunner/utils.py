@@ -6,7 +6,7 @@ import os.path
 import platform
 import uuid
 from multiprocessing import Queue
-from typing import Dict, List, Any, Text,NoReturn
+from typing import Dict, List, Any, Text, NoReturn
 
 import sentry_sdk
 from loguru import logger
@@ -287,6 +287,7 @@ def execute_sql(db: DBHandler, sql: Text) -> Text:
         return db.query(parser_sql, one=True)
     elif parser_sql.startswith("delete"):
         return db.delete(parser_sql)
+
 
 def execute_cmd(cmd: Text) -> NoReturn:
     parser_cmd = cmd.split(":")[1]

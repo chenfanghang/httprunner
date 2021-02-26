@@ -5,11 +5,11 @@ import re
 from typing import Any, Set, Text, Callable, List, Dict
 
 from loguru import logger
+from sentry_sdk import capture_exception
+
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
-from rrtv_httprunner.mysqls import DBHandler
-from rrtv_httprunner.utils import execute_sql,execute_cmd, get_statement_type
-from sentry_sdk import capture_exception
+from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -19,7 +19,7 @@ dolloar_regex_compile = re.compile(r"\$\$")
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
 function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\.\-/\s=,]*)\)\}")
-suffix = ""
+suffix = []
 
 
 def parse_string_value(str_value: Text) -> Any:
@@ -369,6 +369,7 @@ def parse_string(
             suffix = re.findall(r'\[\'(.*?)\'\]', raw_string)
             if suffix:
                 suffix = suffix[0]
+                raw_string = raw_string.split("[")[0]
             if f"${var_name}" == raw_string or "${" + var_name + "}" == raw_string:
                 # raw_string is a variable, $var or ${var}, return its value directly
                 return var_value
@@ -407,18 +408,30 @@ def parse_data(
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
         var_value = parse_string(raw_data, variables_mapping, functions_mapping)
+        global suffix
+        if not suffix:
+            suffix = re.findall(r'\[\'(.*?)\'\]', str(var_value))
+            if suffix:
+                suffix = suffix[0]
+
         if get_statement_type(var_value) == "sql":
             try:
                 value = execute_sql(variables_mapping["mysql"], var_value)
                 if value is None:  # 如果为None说明非select方法
                     return var_value  # 直接返回原字符串
-                return execute_sql(variables_mapping["mysql"], var_value)[suffix]
-            except KeyError:  # 没有suffix后缀
-                return execute_sql(variables_mapping["mysql"], var_value)
+                elif not suffix:  # 没有suffix后缀
+                    return value
+                else:
+                    return value[suffix]
+            except KeyError:  # 没配置数据源
+                raise exceptions.DBError("data source not configured")
         elif get_statement_type(var_value) == "cmd":
             execute_cmd(var_value)
         else:
-            return var_value
+            if isinstance(var_value, dict):
+                return var_value[suffix] if suffix != [] else var_value
+            else:
+                return var_value
 
     elif isinstance(raw_data, (list, set, tuple)):
         return [
@@ -455,8 +468,7 @@ def parse_variables_mapping(
 
             # check if reference variable itself
             if var_name in variables:
-                # e.g.
-                # variables_mapping = {"token": "abc$token"}
+                # e.g               # variables_mapping = {"token": "abc$token"}
                 # variables_mapping = {"key": ["$key", 2]}
                 raise exceptions.VariableNotFound(var_name)
 

@@ -232,9 +232,8 @@ class StepRequestExtraction(object):
         self.__step_context.extract[var_name] = jmes_path
         return self
 
-    def with_extra(self, var_name: Text, sql: Text) -> "StepRequestExtraction":
-        # self.__step_context.extract[var_name] = sql
-        self.__step_context.extra[var_name]=sql
+    def with_extra(self, extra: Text, var_name: Text) -> "StepRequestExtraction":
+        self.__step_context.extract[var_name] = extra
         return self
 
     # def with_regex(self):

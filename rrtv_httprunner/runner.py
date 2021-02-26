@@ -136,7 +136,7 @@ class HttpRunner(object):
 
     def __execute(self, aspect: Text, step: TStep, variables_mapping=None,
                   functions_mapping=None, ) -> NoReturn:
-        db = ["mysql", "redis", "mongodb","cmd"]
+        db = ["mysql", "redis", "mongodb", "cmd"]
         has_db_attr = False
         for d in db:  # 判断是否有数据源
             if d in step.variables:
@@ -182,7 +182,7 @@ class HttpRunner(object):
 
         variables_mapping = step.variables
         # variables_mapping.update(extract_mapping)
-        # 执行setup
+        # execute setup
         self.__execute("setup", step, variables_mapping, self.__project_meta.functions)
 
         # prepare arguments
@@ -225,7 +225,7 @@ class HttpRunner(object):
 
         # extract
         extractors = step.extract
-        extract_mapping = resp_obj.extract(extractors)
+        extract_mapping = resp_obj.extract(extractors,variables_mapping,self.__project_meta.functions)
         step_data.export_vars = extract_mapping
 
         variables_mapping = step.variables
@@ -377,7 +377,6 @@ class HttpRunner(object):
             # step variables > testcase config variables
             step.variables = merge_variables(step.variables, self.__config.variables)
             step.variables = merge_variables(step.variables, self.__config.db)
-            # step.variables = merge_variables(step.variables, step.extra)
 
             # parse variables
             step.variables = parse_variables_mapping(

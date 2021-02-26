@@ -78,7 +78,6 @@ class TStep(BaseModel):
     export: Export = []
     validators: Validators = Field([], alias="validate")
     validate_script: List[Text] = []
-    extra: VariablesMapping = {}
     setup: SetUp = []
     teardown: TearDown = []
 
