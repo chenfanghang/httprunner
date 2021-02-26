@@ -10,7 +10,7 @@ class DBHandler(object):
 
     # 也可以继承 Connection 这里没有选择继承
     def __init__(self, _db: dict, **kwargs):
-        _db = eval(_db)
+        _db if isinstance(_db, dict) else eval(_db)
         self.connect = pymysql.connect(
             host=str(_db["host"]),  # 连接名
             port=int(_db["port"]),  # 端口
