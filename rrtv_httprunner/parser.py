@@ -417,14 +417,17 @@ def parse_data(
         if get_statement_type(var_value) == "sql":
             try:
                 value = execute_sql(variables_mapping["mysql"], var_value)
-                if value is None:  # 如果为None说明非select方法
-                    return var_value  # 直接返回原字符串
-                elif not suffix:  # 没有suffix后缀
-                    return value
-                else:
-                    return value[suffix]
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("data source not configured")
+            if value is None:  # 如果为None说明非select方法
+                return var_value  # 直接返回原字符串
+            elif not suffix:  # 没有suffix后缀
+                return value
+            else:
+                try:
+                    return value[suffix]
+                except KeyError:
+                    raise exceptions.SuffixError("Suffix name error")
         elif get_statement_type(var_value) == "cmd":
             execute_cmd(var_value)
         else:

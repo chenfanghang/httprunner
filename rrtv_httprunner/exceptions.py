@@ -92,5 +92,10 @@ class SummaryEmpty(MyBaseError):
 class DBError(KeyError):
     pass
 
+
+class SuffixError(KeyError):
+    pass
+
+
 class StatementNonSupportError(MyBaseError):
     pass
