@@ -2,6 +2,8 @@
 import pymysql
 from pymysql.cursors import DictCursor
 
+from rrtv_httprunner import exceptions
+
 
 class DBHandler(object):
     """
@@ -11,18 +13,21 @@ class DBHandler(object):
     # 也可以继承 Connection 这里没有选择继承
     def __init__(self, _db: dict, **kwargs):
         _db if isinstance(_db, dict) else eval(_db)
-        self.connect = pymysql.connect(
-            host=str(_db["host"]),  # 连接名
-            port=int(_db["port"]),  # 端口
-            user=_db["user"],  # 用户名
-            password=_db["password"],  # 密码
-            charset=_db["charset"],  # 不能写utf-8 在MySQL里面写utf-8会报错
-            database=_db["database"],  # 数据库库名
-            cursorclass=DictCursor,  # 数据转换成字典格式
-            **kwargs
-        )
-        # 创建游标对象  **主要**
-        self.cursor = self.connect.cursor()
+        try:
+            self.connect = pymysql.connect(
+                host=str(_db["host"]),  # 连接名
+                port=int(_db["port"]),  # 端口
+                user=_db["user"],  # 用户名
+                password=_db["password"],  # 密码
+                charset=_db["charset"],  # 不能写utf-8 在MySQL里面写utf-8会报错
+                database=_db["database"],  # 数据库库名
+                cursorclass=DictCursor,  # 数据转换成字典格式
+                **kwargs
+            )
+            # 创建游标对象  **主要**
+            self.cursor = self.connect.cursor()
+        except TypeError:
+            raise exceptions.DBConnectionError(f"""MYSQL数据库连接失败:{_db}""")
 
     def query_one(self, query, args=None):
         """
@@ -79,14 +84,7 @@ class DBHandler(object):
         self.connect.close()
 
     def __del__(self):
-        self.close()
-        # self.cursor.close()
-
-
-if __name__ == '__main__':
-    db = DBHandler(
-        {'host': '10.97.8.67', 'port': '3306', 'user': 'rrtvappuser', 'password': 'c36bad1e12', 'charset': 'utf8',
-         'database': 'rrmj2'}  # 数据库库名
-    )
-    sql = f"select * from t_user_appeal_record;"
-    print(db.query(sql, one=True))
+        try:
+            self.close()
+        except AttributeError:
+            pass

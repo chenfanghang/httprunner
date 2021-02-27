@@ -145,11 +145,13 @@ class HttpRunner(object):
                 break
 
         if aspect == "setup":
-            for attr in not_need_configured_attr:  # 判断是否有数据源
-                for setup in step.setup:
-                    if attr in setup:
-                        has_attr = True
-                        break
+            if not has_attr:
+                for attr in not_need_configured_attr:  # 判断是否有数据源
+                    for setup in step.setup:
+                        if attr in setup:
+                            has_attr = True
+                            break
+
             if has_attr is True:
                 if step.setup:
                     logger.info("setup begin execute >>>>>>")
@@ -158,11 +160,13 @@ class HttpRunner(object):
                             s, variables_mapping, functions_mapping
                         )
         elif aspect == "teardown":
-            for attr in not_need_configured_attr:  # 判断是否有数据源
-                for teardown in step.teardown:
-                    if attr in teardown:
-                        has_attr = True
-                        break
+            if not has_attr:
+                for attr in not_need_configured_attr:  # 判断是否有数据源
+                    for teardown in step.teardown:
+                        if attr in teardown:
+                            has_attr = True
+                            break
+
             if has_attr is True:
                 if step.teardown:
                     logger.info("teardown begin execute >>>>>>")

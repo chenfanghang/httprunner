@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rrtv-httprunner"
-version = "1.2.2"
+version = "1.2.4"
 description = "One-stop solution for HTTP(S) testing."
 license = "Apache-2.0"
 #readme = "README.md"
@@ -39,6 +39,9 @@ black = "^19.10b0"
 pytest = "^5.4.2"
 pytest-html = "^2.1.1"
 sentry-sdk = "^0.14.4"
+PyMySQL="^1.0.2"
+redis="^3.5.3"
+jsonpath = "^0.82"
 allure-pytest = {version = "^2.8.16", optional = true}
 requests-toolbelt = {version = "^0.9.1", optional = true}
 filetype = {version = "^1.0.7", optional = true}

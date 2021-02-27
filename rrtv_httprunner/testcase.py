@@ -237,15 +237,15 @@ class StepRequestExtraction(object):
         return self
 
     def with_sql(self, sql: Text, var_name: Text) -> "StepRequestExtraction":
-        self.__step_context.extract[var_name] = "sql:"+sql
+        self.__step_context.extract[var_name] = "sql:" + sql
         return self
 
     def with_redis(self, redis: Text, var_name: Text) -> "StepRequestExtraction":
-        self.__step_context.extract[var_name] = "redis:"+redis
+        self.__step_context.extract[var_name] = "redis:" + redis
         return self
 
     def with_mongo(self, mongo: Text, var_name: Text) -> "StepRequestExtraction":
-        self.__step_context.extract[var_name] = "mongo:"+mongo
+        self.__step_context.extract[var_name] = "mongo:" + mongo
         return self
 
     # def with_regex(self):
@@ -317,6 +317,22 @@ class RequestWithOptionalArgs(object):
         self.__step_context.teardown.append(command)
         return self
 
+    def teardown_sql(self, sql: Text) -> "RequestWithOptionalArgs":
+        self.__step_context.teardown.append("sql:" + sql)
+        return self
+
+    def teardown_redis(self, redis: Text) -> "RequestWithOptionalArgs":
+        self.__step_context.teardown.append("redis:" + redis)
+        return self
+
+    def teardown_mongo(self, mongo: Text) -> "RequestWithOptionalArgs":
+        self.__step_context.teardown.append("mongo:" + mongo)
+        return self
+
+    def teardown_cmd(self, command: Text) -> "RequestWithOptionalArgs":
+        self.__step_context.teardown.append("cmd:" + command)
+        return self
+
     def extract(self) -> StepRequestExtraction:
         return StepRequestExtraction(self.__step_context)
 
@@ -335,12 +351,24 @@ class RunRequest(object):
         self.__step_context.variables.update(variables)
         return self
 
-    # def setup_exec(self, **variables) -> "RunRequest":
-    #     self.__step_context.variables.update(variables)
-    #     return self
-
-    def setup_exec(self, command) -> "RunRequest":
+    def setup_exec(self, command: Text) -> "RunRequest":
         self.__step_context.setup.append(command)
+        return self
+
+    def setup_sql(self, sql: Text) -> "RunRequest":
+        self.__step_context.setup.append("sql:" + sql)
+        return self
+
+    def setup_redis(self, redis: Text) -> "RunRequest":
+        self.__step_context.setup.append("redis:" + redis)
+        return self
+
+    def setup_mongo(self, mongo: Text) -> "RunRequest":
+        self.__step_context.setup.append("mongo:" + mongo)
+        return self
+
+    def setup_cmd(self, command: Text) -> "RunRequest":
+        self.__step_context.setup.append("cmd:" + command)
         return self
 
     def setup_hook(self, hook: Text, assign_var_name: Text = None) -> "RunRequest":

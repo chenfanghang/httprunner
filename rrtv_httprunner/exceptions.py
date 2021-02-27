@@ -93,6 +93,10 @@ class DBError(KeyError):
     pass
 
 
+class DBConnectionError(TypeError):
+    pass
+
+
 class SuffixError(KeyError):
     pass
 
