@@ -4,9 +4,10 @@ import itertools
 import json
 import os.path
 import platform
+import re
 import uuid
 from multiprocessing import Queue
-from typing import Dict, List, Any, Text, NoReturn
+from typing import Dict, List, Any, Text, NoReturn, Union
 
 import sentry_sdk
 from loguru import logger
@@ -15,6 +16,7 @@ from rrtv_httprunner import __version__
 from rrtv_httprunner import exceptions
 from rrtv_httprunner.models import VariablesMapping
 from rrtv_httprunner.mysqls import DBHandler
+from rrtv_httprunner.rediss import RedisHandler
 
 
 def init_sentry_sdk():
@@ -275,21 +277,51 @@ def get_statement_type(statement: Text) -> Text:
             return "cmd"
 
 
-def execute_sql(db: DBHandler, sql: Text) -> Text:
+def execute_sql(db: Union[str, dict], sql: Text) -> Text:
     parser_sql = sql.split(":")[1].split(";")[0] + ";"
-    db = DBHandler(db)
+    handler = DBHandler(db)
     logger.info("execute sql: {" + parser_sql + "}")
     if parser_sql.startswith("select"):
-        return db.query(parser_sql, one=True)
+        return handler.query(parser_sql, one=True)
     elif parser_sql.startswith("insert"):
-        return db.query(parser_sql, one=True)
+        return handler.query(parser_sql, one=True)
     elif parser_sql.startswith("update"):
-        return db.query(parser_sql, one=True)
+        return handler.query(parser_sql, one=True)
     elif parser_sql.startswith("delete"):
-        return db.delete(parser_sql)
+        return handler.delete(parser_sql)
 
 
 def execute_cmd(cmd: Text) -> NoReturn:
     parser_cmd = cmd.split(":")[1]
-    logger.info("execute cmd: {" + parser_cmd + "}")
+    logger.info("execute cmd: { " + parser_cmd + " }")
     os.system(parser_cmd)
+
+
+def execute_redis(rd: Union[str, dict], cli: Text) -> Text:
+    p_cli = cli.split(":")[1]
+    handler = RedisHandler(rd)
+    # handler = RedisHandler({'host': 'localhost', 'port': '6379', 'password': '', 'db': '0'})
+    logger.info("execute redis: { " + p_cli + " }")
+    content = re.findall(r'\'(.*?)\'', str(p_cli))
+    if p_cli.startswith("get"):
+        return handler.str_get(content[0])
+    elif p_cli.startswith("hget"):
+        handler.hash_getall(content[0]) if len(content) == 1 else handler.hash_get(content[0], content[1])
+    elif p_cli.startswith("set"):
+        return handler.str_set(content[0], content[1])
+    elif p_cli.startswith("hset"):
+        return handler.hash_set(content[0], content[1], content[2])
+    elif p_cli.startswith("del"):
+        return handler.delete(content[0])
+    elif p_cli.startswith("hdel"):
+        return handler.str_set(content[0], content[1])
+    elif p_cli.startswith("clean"):
+        return handler.clean_redis
+
+
+if __name__ == '__main__':
+    # cli = "redis:set('a','s')"
+    # parser_redis = cli.split(":")[1]
+    # suffix = re.findall(r'\'(.*?)\'', str(parser_redis))
+    # print(len(suffix))
+    print(execute_redis(None, "redis:get('aaaa')"))

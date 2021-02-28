@@ -9,7 +9,7 @@ from sentry_sdk import capture_exception
 
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
-from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type
+from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -429,7 +429,9 @@ def parse_data(
                 except KeyError:
                     raise exceptions.SuffixError("Suffix name error")
         elif get_statement_type(var_value) == "cmd":
-            execute_cmd(var_value)
+            return execute_cmd(var_value)
+        elif get_statement_type(var_value) == "redis":
+            return execute_redis(variables_mapping["redis"], var_value)
         else:
             if isinstance(var_value, dict):
                 return var_value[suffix] if suffix != [] else var_value

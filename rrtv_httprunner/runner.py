@@ -395,7 +395,7 @@ class HttpRunner(object):
             step.variables = merge_variables(step.variables, extracted_variables)
             # step variables > testcase config variables
             step.variables = merge_variables(step.variables, self.__config.variables)
-            step.variables = merge_variables(step.variables, self.__config.db)
+            step.variables = merge_variables(step.variables, self.__config.datasource)
 
             # parse variables
             step.variables = parse_variables_mapping(

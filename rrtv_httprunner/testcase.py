@@ -18,7 +18,7 @@ class Config(object):
         self.__verify = False
         self.__export = []
         self.__weight = 1
-        self.__db = {}
+        self.__datasource = {}
         caller_frame = inspect.stack()[1]
         self.__path = caller_frame.filename
 
@@ -54,9 +54,9 @@ class Config(object):
         self.__weight = weight
         return self
 
-    def db(self, **db) -> "Config":
+    def datasource(self, **datasource) -> "Config":
         # self.__db = db
-        self.__db.update(db)
+        self.__datasource.update(datasource)
         return self
 
     def perform(self) -> TConfig:
@@ -68,7 +68,7 @@ class Config(object):
             export=list(set(self.__export)),
             path=self.__path,
             weight=self.__weight,
-            db=self.__db
+            datasource=self.__datasource
         )
 
 
@@ -233,18 +233,59 @@ class StepRequestExtraction(object):
         return self
 
     def with_extra(self, extra: Text, var_name: Text) -> "StepRequestExtraction":
+        """ 提取数据
+
+        Args:
+            extra: 执行的命令
+            var_name: 存储的变量名 后续通过$引用
+
+        Examples:
+            >>> StepRequestExtraction.with_extra("sql:xxx","var_name")
+            >>> StepRequestExtraction.with_extra("redis:xxx","var_name")
+            >>> StepRequestExtraction.with_extra("mongo:xxx","var_name")
+            >>> StepRequestExtraction.with_extra("cmd:xxx","var_name")
+
+        """
         self.__step_context.extract[var_name] = extra
         return self
 
     def with_sql(self, sql: Text, var_name: Text) -> "StepRequestExtraction":
+        """ 提取sql数据
+
+        Args:
+            sql: 执行SQL
+            var_name: 存储的变量名 后续通过$引用
+
+        Examples:
+            >>> StepRequestExtraction.with_sql("select * from mysql","var_name")
+
+        """
         self.__step_context.extract[var_name] = "sql:" + sql
         return self
 
     def with_redis(self, redis: Text, var_name: Text) -> "StepRequestExtraction":
+        """
+
+        Args:
+            redis: redis命令
+            var_name: 存储的变量名 后续通过$引用
+
+        Examples:
+            >>> StepRequestExtraction.with_redis("get('key')","var_name") # 取出键key对应的值
+            >>> StepRequestExtraction.with_redis("hget('name','key')","var_name") # 取出hash的key对应的值
+            >>> StepRequestExtraction.with_redis("hget('name')","var_name") # 取出hash中所有的键值对
+            >>> StepRequestExtraction.with_redis("set('key','rrtv')","var_name") # 设置key对应的值
+            >>> StepRequestExtraction.with_redis("hset('name','key','value')","var_name") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
+            >>> StepRequestExtraction.with_redis("del('key')","var_name") # 删除指定key的键值对
+            >>> StepRequestExtraction.with_redis("hdel(name, k)","var_name") # 删除hash中键值对
+            >>> StepRequestExtraction.with_redis("clean","var_name") # 清空redis
+
+        """
         self.__step_context.extract[var_name] = "redis:" + redis
         return self
 
     def with_mongo(self, mongo: Text, var_name: Text) -> "StepRequestExtraction":
+        # TODO
         self.__step_context.extract[var_name] = "mongo:" + mongo
         return self
 
@@ -314,22 +355,69 @@ class RequestWithOptionalArgs(object):
         return self
 
     def teardown_exec(self, command) -> "RequestWithOptionalArgs":
+        """ 在接口执行之后执行命令
+
+        Args:
+            command: 执行的命令
+
+        Examples:
+            >>> RequestWithOptionalArgs.teardown_exec("sql:xxx")
+            >>> RequestWithOptionalArgs.teardown_exec("redis:xxx")
+            >>> RequestWithOptionalArgs.teardown_exec("mongo:xxx")
+            >>> RequestWithOptionalArgs.teardown_exec("cmd:xxx")
+
+        """
         self.__step_context.teardown.append(command)
         return self
 
     def teardown_sql(self, sql: Text) -> "RequestWithOptionalArgs":
+        """ 在接口执行之后执行SQL
+
+        Args:
+            sql: 执行SQL
+
+        Examples:
+            >>> RequestWithOptionalArgs.teardown_sql("select * from mysql")
+
+        """
         self.__step_context.teardown.append("sql:" + sql)
         return self
 
     def teardown_redis(self, redis: Text) -> "RequestWithOptionalArgs":
+        """ 在接口执行之后执行redis
+
+        Args:
+            redis: redis命令
+
+        Examples:
+            >>> RequestWithOptionalArgs.teardown_redis("get('key')") # 取出键key对应的值
+            >>> RequestWithOptionalArgs.teardown_redis("hget('name','key')") # 取出hash的key对应的值
+            >>> RequestWithOptionalArgs.teardown_redis("hget('name')") # 取出hash中所有的键值对
+            >>> RequestWithOptionalArgs.teardown_redis("set('key','rrtv')") # 设置key对应的值
+            >>> RequestWithOptionalArgs.teardown_redis("hset('name','key','value')") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
+            >>> RequestWithOptionalArgs.teardown_redis("del('key')") # 删除指定key的键值对
+            >>> RequestWithOptionalArgs.teardown_redis("hdel(name, k)") # 删除hash中键值对
+            >>> RequestWithOptionalArgs.teardown_redis("clean") # 清空redis
+
+        """
         self.__step_context.teardown.append("redis:" + redis)
         return self
 
     def teardown_mongo(self, mongo: Text) -> "RequestWithOptionalArgs":
+        # TODO
         self.__step_context.teardown.append("mongo:" + mongo)
         return self
 
     def teardown_cmd(self, command: Text) -> "RequestWithOptionalArgs":
+        """ 在接口执行之后执行cmd命令
+
+        Args:
+            command: cmd命令
+
+        Examples:
+            >>> RequestWithOptionalArgs.teardown_cmd("echo 'Hello World !'")
+
+        """
         self.__step_context.teardown.append("cmd:" + command)
         return self
 
@@ -352,22 +440,69 @@ class RunRequest(object):
         return self
 
     def setup_exec(self, command: Text) -> "RunRequest":
+        """ 在接口执行之前执行命令
+
+        Args:
+            command: 执行的命令
+
+        Examples:
+            >>> RunRequest.setup_exec("sql:xxx")
+            >>> RunRequest.setup_exec("redis:xxx")
+            >>> RunRequest.setup_exec("mongo:xxx")
+            >>> RunRequest.setup_exec("cmd:xxx")
+
+        """
         self.__step_context.setup.append(command)
         return self
 
     def setup_sql(self, sql: Text) -> "RunRequest":
+        """ 在接口执行之前执行SQL
+
+        Args:
+            sql: 执行SQL
+
+        Examples:
+            >>> RunRequest.setup_sql("select * from mysql")
+
+        """
         self.__step_context.setup.append("sql:" + sql)
         return self
 
     def setup_redis(self, redis: Text) -> "RunRequest":
+        """ 在接口执行之前执行redis
+
+        Args:
+            redis: redis命令
+
+        Examples:
+            >>> RunRequest.setup_redis("get('key')") # 取出键key对应的值
+            >>> RunRequest.setup_redis("hget('name','key')") # 取出hash的key对应的值
+            >>> RunRequest.setup_redis("hget('name')") # 取出hash中所有的键值对
+            >>> RunRequest.setup_redis("set('key','rrtv')") # 设置key对应的值
+            >>> RunRequest.setup_redis("hset('name','key','value')") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
+            >>> RunRequest.setup_redis("del('key')") # 删除指定key的键值对
+            >>> RunRequest.setup_redis("hdel(name, k)") # 删除hash中键值对
+            >>> RunRequest.setup_redis("clean") # 清空redis
+
+        """
         self.__step_context.setup.append("redis:" + redis)
         return self
 
     def setup_mongo(self, mongo: Text) -> "RunRequest":
+        # TODO
         self.__step_context.setup.append("mongo:" + mongo)
         return self
 
     def setup_cmd(self, command: Text) -> "RunRequest":
+        """ 在接口执行之前执行cmd命令
+
+        Args:
+            command: cmd命令
+
+        Examples:
+            >>> RunRequest.setup_cmd("echo 'Hello World !'")
+
+        """
         self.__step_context.setup.append("cmd:" + command)
         return self
 

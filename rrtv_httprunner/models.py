@@ -46,7 +46,7 @@ class TConfig(BaseModel):
     export: Export = []
     path: Text = None
     weight: int = 1
-    db: Union[VariablesMapping, Text] = {}
+    datasource: Union[VariablesMapping, Text] = {}
 
 
 class TRequest(BaseModel):

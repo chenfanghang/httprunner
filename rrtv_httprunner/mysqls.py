@@ -1,5 +1,7 @@
-# import jsonpath
+from typing import Union
+
 import pymysql
+from loguru import logger
 from pymysql.cursors import DictCursor
 
 from rrtv_httprunner import exceptions
@@ -11,23 +13,24 @@ class DBHandler(object):
     """
 
     # 也可以继承 Connection 这里没有选择继承
-    def __init__(self, _db: dict, **kwargs):
-        _db if isinstance(_db, dict) else eval(_db)
+    def __init__(self, driver: Union[str, dict], **kwargs):
+        driver = driver if isinstance(driver, dict) else eval(driver)
         try:
             self.connect = pymysql.connect(
-                host=str(_db["host"]),  # 连接名
-                port=int(_db["port"]),  # 端口
-                user=_db["user"],  # 用户名
-                password=_db["password"],  # 密码
-                charset=_db["charset"],  # 不能写utf-8 在MySQL里面写utf-8会报错
-                database=_db["database"],  # 数据库库名
+                host=str(driver["host"]),  # 连接名
+                port=int(driver["port"]),  # 端口
+                user=driver["user"],  # 用户名
+                password=driver["password"],  # 密码
+                charset=driver["charset"],  # 不能写utf-8 在MySQL里面写utf-8会报错
+                database=driver["database"],  # 数据库库名
                 cursorclass=DictCursor,  # 数据转换成字典格式
                 **kwargs
             )
             # 创建游标对象  **主要**
             self.cursor = self.connect.cursor()
-        except TypeError:
-            raise exceptions.DBConnectionError(f"""MYSQL数据库连接失败:{_db}""")
+        except TypeError as ex:
+            logger.error(f"""MYSQL数据库连接失败:{driver}""")
+            raise exceptions.DBConnectionError(f"""MYSQL数据库连接失败:{driver}""")
 
     def query_one(self, query, args=None):
         """
