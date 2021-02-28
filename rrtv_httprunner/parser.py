@@ -418,7 +418,7 @@ def parse_data(
             try:
                 value = execute_sql(variables_mapping["mysql"], var_value)
             except KeyError:  # 没配置数据源
-                raise exceptions.DBError("data source not configured")
+                raise exceptions.DBError("mysql datasource not configured")
             if value is None:  # 如果为None说明非select方法
                 return var_value  # 直接返回原字符串
             elif not suffix:  # 没有suffix后缀
@@ -427,11 +427,15 @@ def parse_data(
                 try:
                     return value[suffix]
                 except KeyError:
-                    raise exceptions.SuffixError("Suffix name error")
+                    raise exceptions.SuffixError("suffix name error")
         elif get_statement_type(var_value) == "cmd":
             return execute_cmd(var_value)
         elif get_statement_type(var_value) == "redis":
-            return execute_redis(variables_mapping["redis"], var_value)
+            try:
+                return execute_redis(variables_mapping["redis"], var_value)
+            except KeyError:  # 没配置数据源
+                raise exceptions.DBError("redis datasource not configured")
+
         else:
             if isinstance(var_value, dict):
                 return var_value[suffix] if suffix != [] else var_value

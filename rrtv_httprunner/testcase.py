@@ -1,5 +1,5 @@
 import inspect
-from typing import Text, Any, Union, Callable
+from typing import Text, Any, Union, Callable, Dict
 
 from rrtv_httprunner.models import (
     TConfig,
@@ -55,8 +55,28 @@ class Config(object):
         return self
 
     def datasource(self, **datasource) -> "Config":
-        # self.__db = db
+        """
+
+        Args:
+            **datasource: 数据源 k:v格式
+
+        Examples:
+            >>> Config.datasource(**{"redis": "{'host': 'localhost', 'port': '6379', 'password': '', 'db': '0'}"})
+
+        """
         self.__datasource.update(datasource)
+        return self
+
+    def mysql(self, config: Union[Text, Dict]) -> "Config":
+        self.__datasource["mysql"] = config
+        return self
+
+    def redis(self, config: Union[Text, Dict]) -> "Config":
+        self.__datasource["redis"] = config
+        return self
+
+    def mongodb(self, config: Union[Text, Dict]) -> "Config":
+        self.__datasource["mongo"] = config
         return self
 
     def perform(self) -> TConfig:
