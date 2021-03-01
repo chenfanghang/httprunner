@@ -299,13 +299,13 @@ class StepRequestExtraction(object):
             >>> StepRequestExtraction.with_redis("del('key')","var_name") # 删除指定key的键值对
             >>> StepRequestExtraction.with_redis("hdel(name, k)","var_name") # 删除hash中键值对
             >>> StepRequestExtraction.with_redis("clean","var_name") # 清空redis
+            >>> StepRequestExtraction.with_redis("str_get('key')","var_name") # 直接调用api
 
         """
         self.__step_context.extract[var_name] = "redis:" + redis
         return self
 
     def with_mongo(self, mongo: Text, var_name: Text) -> "StepRequestExtraction":
-        # TODO
         self.__step_context.extract[var_name] = "mongo:" + mongo
         return self
 
@@ -418,13 +418,13 @@ class RequestWithOptionalArgs(object):
             >>> RequestWithOptionalArgs.teardown_redis("del('key')") # 删除指定key的键值对
             >>> RequestWithOptionalArgs.teardown_redis("hdel(name, k)") # 删除hash中键值对
             >>> RequestWithOptionalArgs.teardown_redis("clean") # 清空redis
+            >>> RequestWithOptionalArgs.teardown_redis("str_get('key')") # 直接调用api
 
         """
         self.__step_context.teardown.append("redis:" + redis)
         return self
 
     def teardown_mongo(self, mongo: Text) -> "RequestWithOptionalArgs":
-        # TODO
         self.__step_context.teardown.append("mongo:" + mongo)
         return self
 
@@ -503,6 +503,7 @@ class RunRequest(object):
             >>> RunRequest.setup_redis("del('key')") # 删除指定key的键值对
             >>> RunRequest.setup_redis("hdel(name, k)") # 删除hash中键值对
             >>> RunRequest.setup_redis("clean") # 清空redis
+            >>> RunRequest.setup_redis("str_get('key')","var_name") # 直接调用api
 
         """
         self.__step_context.setup.append("redis:" + redis)

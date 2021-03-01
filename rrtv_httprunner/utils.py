@@ -15,7 +15,8 @@ from loguru import logger
 from rrtv_httprunner import __version__
 from rrtv_httprunner import exceptions
 from rrtv_httprunner.models import VariablesMapping
-from rrtv_httprunner.mysqls import DBHandler
+from rrtv_httprunner.mongo import MongoHandler
+from rrtv_httprunner.mysqls import MySQLHandler
 from rrtv_httprunner.rediss import RedisHandler
 
 
@@ -278,50 +279,57 @@ def get_statement_type(statement: Text) -> Text:
 
 
 def execute_sql(db: Union[str, dict], sql: Text) -> Text:
-    parser_sql = sql.split(":")[1].split(";")[0] + ";"
-    handler = DBHandler(db)
-    logger.info("execute sql: {" + parser_sql + "}")
-    if parser_sql.startswith("select"):
-        return handler.query(parser_sql, one=True)
-    elif parser_sql.startswith("insert"):
-        return handler.query(parser_sql, one=True)
-    elif parser_sql.startswith("update"):
-        return handler.query(parser_sql, one=True)
-    elif parser_sql.startswith("delete"):
-        return handler.delete(parser_sql)
+    match_start_position = sql.index(":", 0)
+    parsed_string = sql[match_start_position + 1:]
+    handler = MySQLHandler(db)
+    logger.info("execute sql: {" + parsed_string + "}")
+    if parsed_string.startswith("select"):
+        return handler.query(parsed_string, one=True)
+    elif parsed_string.startswith("insert"):
+        return handler.query(parsed_string, one=True)
+    elif parsed_string.startswith("update"):
+        return handler.query(parsed_string, one=True)
+    elif parsed_string.startswith("delete"):
+        return handler.delete(parsed_string)
 
 
 def execute_cmd(cmd: Text) -> NoReturn:
-    parser_cmd = cmd.split(":")[1]
-    logger.info("execute cmd: { " + parser_cmd + " }")
-    os.system(parser_cmd)
+    match_start_position = cmd.index(":", 0)
+    parsed_string = cmd[match_start_position + 1:]
+    logger.info("execute cmd: { " + parsed_string + " }")
+    os.system(parsed_string)
 
 
 def execute_redis(rd: Union[str, dict], cli: Text) -> Text:
-    p_cli = cli.split(":")[1]
+    match_start_position = cli.index(":", 0)
+    parsed_string = cli[match_start_position + 1:]
     handler = RedisHandler(rd)
-    # handler = RedisHandler({'host': 'localhost', 'port': '6379', 'password': '', 'db': '0'})
-    logger.info("execute redis: { " + p_cli + " }")
-    content = re.findall(r'\'(.*?)\'', str(p_cli))
-    if p_cli.startswith("get"):
+    logger.info("execute redis: { " + parsed_string + " }")
+    content = re.findall(r'\'(.*?)\'', str(parsed_string))
+    if parsed_string.startswith("get("):
         return handler.str_get(content[0])
-    elif p_cli.startswith("hget"):
+    elif parsed_string.startswith("hget("):
         handler.hash_getall(content[0]) if len(content) == 1 else handler.hash_get(content[0], content[1])
-    elif p_cli.startswith("set"):
+    elif parsed_string.startswith("set("):
         return handler.str_set(content[0], content[1])
-    elif p_cli.startswith("hset"):
+    elif parsed_string.startswith("hset("):
         return handler.hash_set(content[0], content[1], content[2])
-    elif p_cli.startswith("del"):
+    elif parsed_string.startswith("del("):
         return handler.delete(content[0])
-    elif p_cli.startswith("hdel"):
+    elif parsed_string.startswith("hdel("):
         return handler.str_set(content[0], content[1])
-    elif p_cli.startswith("clean"):
+    elif parsed_string.startswith("clean") and parsed_string!="clean_redis":
         return handler.clean_redis
+    else:
+        scope = {'handler': RedisHandler(rd)}
+        cli = "handler." + parsed_string
+        return eval(cli, scope)
 
 
-if __name__ == '__main__':
-    # cli = "redis:set('a','s')"
-    # parser_redis = cli.split(":")[1]
-    # suffix = re.findall(r'\'(.*?)\'', str(parser_redis))
-    # print(len(suffix))
-    print(execute_redis(None, "redis:get('aaaa')"))
+def execute_mongo(db: Union[str, dict], operation: Text) -> Text:
+    match_start_position = operation.index(":", 0)
+    parsed_string = operation[match_start_position + 1:]
+    logger.info("execute mongodb: { " + parsed_string + " }")
+    scope = {'handler': MongoHandler(db["driver"], db["database"])}
+    cli = "handler." + parsed_string
+    return eval(cli, scope)

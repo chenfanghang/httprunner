@@ -7,7 +7,7 @@ from pymysql.cursors import DictCursor
 from rrtv_httprunner import exceptions
 
 
-class DBHandler(object):
+class MySQLHandler(object):
     """
     初始化数据库
     """

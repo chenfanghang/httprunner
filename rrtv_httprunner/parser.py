@@ -9,7 +9,7 @@ from sentry_sdk import capture_exception
 
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
-from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis
+from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis, execute_mongo
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -435,7 +435,11 @@ def parse_data(
                 return execute_redis(variables_mapping["redis"], var_value)
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("redis datasource not configured")
-
+        elif get_statement_type(var_value) == "mongo":
+            try:
+                return execute_mongo(variables_mapping["mongo"], var_value)
+            except KeyError:  # 没配置数据源
+                raise exceptions.DBError("mongo datasource not configured")
         else:
             if isinstance(var_value, dict):
                 return var_value[suffix] if suffix != [] else var_value
