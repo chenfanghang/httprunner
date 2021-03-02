@@ -441,8 +441,14 @@ def parse_data(
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("mongo datasource not configured")
         else:
+
             if isinstance(var_value, dict):
-                return var_value[suffix] if suffix != [] else var_value
+                match_start_position = raw_data.index("]", 0)
+                parsed_string = raw_data[match_start_position + 1:]
+                if parsed_string != "" or parsed_string is not None:
+                    return str(var_value[suffix]) + parsed_string if suffix != [] else str(var_value) + parsed_string
+                else:
+                    return var_value[suffix] if suffix != [] else var_value
             else:
                 return var_value
 
