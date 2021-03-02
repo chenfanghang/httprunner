@@ -240,6 +240,26 @@ class StepRequestValidation(object):
         )
         return self
 
+    def assert_if_equal(
+            self, condition, jmes_path: Text, if_expected_value: Any, else_expected_value: Any = None,
+            message: Text = ""
+    ) -> "StepRequestValidation":
+        """
+        if断言 如果condition为True时expect_value为if_expected_value，否则为else_expected_value
+        Args:
+            condition: 条件
+            jmes_path: jmespath语法
+            if_expected_value: if值
+            else_expected_value: else值
+            message: 提示信息
+
+        """
+
+        self.__step_context.validators.append(
+            {"equal": [condition, jmes_path, if_expected_value, else_expected_value, message]}
+        )
+        return self
+
     def perform(self) -> TStep:
         return self.__step_context
 

@@ -509,12 +509,3 @@ class HttpRunner(object):
         finally:
             logger.remove(log_handler)
             logger.info(f"generate testcase log: {self.__log_path}")
-
-
-if __name__ == '__main__':
-    list_a = ["a", "b"]
-    dict_b = {"a": "1", "b": "2", "c": "3", "d": "4"}
-    for l in list_a:
-        if l in dict_b:
-            print(l in dict_b)
-            break

@@ -318,7 +318,7 @@ def execute_redis(rd: Union[str, dict], cli: Text) -> Text:
         return handler.delete(content[0])
     elif parsed_string.startswith("hdel("):
         return handler.str_set(content[0], content[1])
-    elif parsed_string.startswith("clean") and parsed_string!="clean_redis":
+    elif parsed_string.startswith("clean") and parsed_string != "clean_redis":
         return handler.clean_redis
     else:
         scope = {'handler': RedisHandler(rd)}

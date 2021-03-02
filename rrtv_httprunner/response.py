@@ -51,10 +51,13 @@ def get_uniform_comparator(comparator: Text):
         return comparator
 
 
-def uniform_validator(validator):
+def uniform_validator(validator, variables_mapping: VariablesMapping = None,
+                      functions_mapping: FunctionsMapping = None, ):
     """ unify validator
 
     Args:
+        functions_mapping:
+        variables_mapping:
         validator (dict): validator maybe in two formats:
 
             format1: this is kept for compatibility with the previous versions.
@@ -74,6 +77,10 @@ def uniform_validator(validator):
             }
 
     """
+    check_item = ""
+    expect_value = ""
+    message = ""
+    comparator = ""
     if not isinstance(validator, dict):
         raise ParamsError(f"invalid validator: {validator}")
 
@@ -89,16 +96,26 @@ def uniform_validator(validator):
         comparator = list(validator.keys())[0]
         compare_values = validator[comparator]
 
-        if not isinstance(compare_values, list) or len(compare_values) not in [2, 3]:
+        if not isinstance(compare_values, list) or len(compare_values) not in [2, 3, 4, 5]:
             raise ParamsError(f"invalid validator: {validator}")
-
-        check_item = compare_values[0]
-        expect_value = compare_values[1]
-        if len(compare_values) == 3:
-            message = compare_values[2]
-        else:
-            # len(compare_values) == 2
+        if len(compare_values) == 2:
+            check_item = compare_values[0]
+            expect_value = compare_values[1]
+        if len(compare_values) == 4 or len(compare_values) == 5:
+            condition = parse_data(
+                compare_values[0], variables_mapping, functions_mapping
+            )
+            check_item = compare_values[1]
+            if eval(condition) is True:
+                expect_value = compare_values[2]
+            else:
+                expect_value = compare_values[3]
+        if len(compare_values) != 3 and len(compare_values) != 5:
             message = ""
+        elif len(compare_values) == 3:
+            message = compare_values[2]
+        elif len(compare_values) == 5:
+            message = compare_values[4]
 
     else:
         raise ParamsError(f"invalid validator: {validator}")
@@ -205,7 +222,7 @@ class ResponseObject(object):
             if "validate_extractor" not in self.validation_results:
                 self.validation_results["validate_extractor"] = []
 
-            u_validator = uniform_validator(v)
+            u_validator = uniform_validator(v, variables_mapping, functions_mapping)
 
             # check item
             check_item = u_validator["check"]

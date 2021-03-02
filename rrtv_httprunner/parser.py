@@ -38,7 +38,7 @@ def parse_string_value(str_value: Text) -> Any:
         return str_value
 
 
-def build_url(base_url, path):
+def build_url(base_url: Text, path: Text):
     """ prepend url with base_url unless it's already an absolute URL """
     if absolute_http_url_regexp.match(path):
         return path
