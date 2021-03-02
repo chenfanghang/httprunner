@@ -366,9 +366,9 @@ def parse_string(
             var_name = var_match.group(1) or var_match.group(2)
             var_value = get_mapping_variable(var_name, variables_mapping)
             global suffix
-            suffix = re.findall(r'\[\'(.*?)\'\]', raw_string)
-            if suffix:
-                suffix = suffix[0]
+            suffix_re = re.findall(r'\[\'(.*?)\'\]', raw_string)
+            if suffix_re:
+                suffix = suffix_re[0]
                 raw_string = raw_string.split("[")[0]
             if f"${var_name}" == raw_string or "${" + var_name + "}" == raw_string:
                 # raw_string is a variable, $var or ${var}, return its value directly
@@ -409,10 +409,9 @@ def parse_data(
         raw_data = raw_data.strip(" \t")
         var_value = parse_string(raw_data, variables_mapping, functions_mapping)
         global suffix
-        if not suffix:
-            suffix = re.findall(r'\[\'(.*?)\'\]', str(var_value))
-            if suffix:
-                suffix = suffix[0]
+        suffix_re = re.findall(r'\[\'(.*?)\'\]', str(var_value))
+        if suffix_re:
+            suffix = suffix_re[0]
 
         if get_statement_type(var_value) == "sql":
             try:
@@ -447,7 +446,11 @@ def parse_data(
                 parsed_string = raw_data[match_start_position + 1:]
                 if parsed_string != "" or parsed_string is not None:
                     p=parse_string(parsed_string, variables_mapping, functions_mapping)
-                    return str(var_value[suffix]) + p if suffix != [] else str(var_value) + p
+                    if suffix != []:
+                        val=var_value[suffix]
+                        return parse_string_value(str(val)+ str(p))
+                    else:
+                        return parse_string_value(str(var_value) + str(p))
                 else:
                     return var_value[suffix] if suffix != [] else var_value
             else:
