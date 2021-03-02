@@ -446,7 +446,8 @@ def parse_data(
                 match_start_position = raw_data.index("]", 0)
                 parsed_string = raw_data[match_start_position + 1:]
                 if parsed_string != "" or parsed_string is not None:
-                    return str(var_value[suffix]) + parsed_string if suffix != [] else str(var_value) + parsed_string
+                    p=parse_string(parsed_string, variables_mapping, functions_mapping)
+                    return str(var_value[suffix]) + p if suffix != [] else str(var_value) + p
                 else:
                     return var_value[suffix] if suffix != [] else var_value
             else:
