@@ -402,13 +402,14 @@ def parse_data(
         Notice: variables_mapping should not contain any variable or function.
     """
     if isinstance(raw_data, str):
+        global suffix
+        suffix=[]
         # content in string format may contains variables and functions
         variables_mapping = variables_mapping or {}
         functions_mapping = functions_mapping or {}
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
         var_value = parse_string(raw_data, variables_mapping, functions_mapping)
-        global suffix
         suffix_re = re.findall(r'\[\'(.*?)\'\]', str(var_value))
         if suffix_re:
             suffix = suffix_re[0]
