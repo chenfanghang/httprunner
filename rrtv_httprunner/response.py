@@ -98,7 +98,7 @@ def uniform_validator(validator, variables_mapping: VariablesMapping = None,
 
         if not isinstance(compare_values, list) or len(compare_values) not in [2, 3, 4, 5]:
             raise ParamsError(f"invalid validator: {validator}")
-        if len(compare_values) == 2:
+        if len(compare_values) == 2 or len(compare_values) == 3:
             check_item = compare_values[0]
             expect_value = compare_values[1]
         if len(compare_values) == 4 or len(compare_values) == 5:
