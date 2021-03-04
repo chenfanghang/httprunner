@@ -21,6 +21,9 @@ class RedisHandler:
     def command(self):
         return self.r
 
+    def exists(self, key):
+        return self.r.exists(key)
+
     def str_get(self, k):
         res = self.r.get(k)  # 会从服务器传对应的值过来，性能慢
         if res:
