@@ -354,6 +354,7 @@ class RequestWithOptionalArgs(object):
         return self
 
     def with_xml(self, xml: Text) -> "RequestWithOptionalArgs":
+        self.__step_context.request.headers["Content-Type"] = "text/xml; charset=UTF-8"
         self.__step_context.request.data = xml
         return self
 
