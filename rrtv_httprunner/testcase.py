@@ -353,6 +353,10 @@ class RequestWithOptionalArgs(object):
         self.__step_context.request.params.update(params)
         return self
 
+    def with_xml(self, xml: Text) -> "RequestWithOptionalArgs":
+        self.__step_context.request.data = xml
+        return self
+
     def with_headers(self, **headers) -> "RequestWithOptionalArgs":
         self.__step_context.request.headers.update(headers)
         return self
