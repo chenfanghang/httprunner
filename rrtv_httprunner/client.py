@@ -174,7 +174,7 @@ class HttpSession(requests.Session):
 
         # set stream to True, in order to get client/server IP/Port
         kwargs["stream"] = True
-        if kwargs["data"] is not None:
+        if kwargs["data"] is not None and isinstance(kwargs["data"], str):
             if kwargs["data"].strip().startswith("<xml>") and kwargs["data"].strip().endswith("</xml>"):
                 kwargs["data"] = str(kwargs["data"]).encode("utf-8").decode("latin1")
 
