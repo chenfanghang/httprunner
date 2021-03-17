@@ -266,6 +266,14 @@ def gen_cartesian_product(*args: List[Dict]) -> List[Dict]:
     return product_list
 
 
+def split_with(str_params) -> Dict:
+    var = str_params.strip().split("&")
+    dict_var = {}
+    for v in var:
+        dict_var[v.split("=")[0]] = v.split("=")[1]
+    return dict_var
+
+
 def get_statement_type(statement: Text) -> Text:
     if isinstance(statement, str):
         if statement.startswith("sql:"):

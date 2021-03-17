@@ -8,6 +8,7 @@ from rrtv_httprunner.models import (
     MethodEnum,
     TestCase,
 )
+from rrtv_httprunner.utils import split_with
 
 
 class Config(object):
@@ -349,8 +350,11 @@ class RequestWithOptionalArgs(object):
     def __init__(self, step_context: TStep):
         self.__step_context = step_context
 
-    def with_params(self, **params) -> "RequestWithOptionalArgs":
-        self.__step_context.request.params.update(params)
+    def with_params(self, str_params: Text = None, **params) -> "RequestWithOptionalArgs":
+        if str_params is not None:
+            self.__step_context.request.params.update(split_with(str_params))
+        else:
+            self.__step_context.request.params.update(params)
         return self
 
     def with_xml(self, xml: Text) -> "RequestWithOptionalArgs":
@@ -358,16 +362,25 @@ class RequestWithOptionalArgs(object):
         self.__step_context.request.data = xml
         return self
 
-    def with_headers(self, **headers) -> "RequestWithOptionalArgs":
-        self.__step_context.request.headers.update(headers)
+    def with_headers(self, str_headers: Text = None, **headers) -> "RequestWithOptionalArgs":
+        if str_headers is not None:
+            self.__step_context.request.headers.update(split_with(str_headers))
+        else:
+            self.__step_context.request.headers.update(headers)
         return self
 
-    def with_cookies(self, **cookies) -> "RequestWithOptionalArgs":
-        self.__step_context.request.cookies.update(cookies)
+    def with_cookies(self, str_cookies: Text = None, **cookies) -> "RequestWithOptionalArgs":
+        if str_cookies is not None:
+            self.__step_context.request.cookies.update(split_with(str_cookies))
+        else:
+            self.__step_context.request.cookies.update(cookies)
         return self
 
-    def with_data(self, data) -> "RequestWithOptionalArgs":
-        self.__step_context.request.data = data
+    def with_data(self, data: Dict = None, str_data: Text = None) -> "RequestWithOptionalArgs":
+        if str_data is not None:
+            self.__step_context.request.data = split_with(str_data)
+        else:
+            self.__step_context.request.data = data
         return self
 
     def with_json(self, req_json) -> "RequestWithOptionalArgs":
