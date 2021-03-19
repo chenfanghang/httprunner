@@ -409,7 +409,7 @@ def parse_data(
         functions_mapping = functions_mapping or {}
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
-        var_value = parse_string_value(parse_string(raw_data, variables_mapping, functions_mapping))
+        var_value = parse_string(raw_data, variables_mapping, functions_mapping)
         suffix_re = re.findall(r'\[\'(.*?)\'\]', str(var_value))
         if suffix_re:
             suffix = suffix_re[0]
