@@ -97,6 +97,74 @@ class StepRequestValidation(object):
     def __init__(self, step_context: TStep):
         self.__step_context = step_context
 
+    def teardown_exec(self, command) -> "StepRequestValidation":
+        """ 在接口执行之后执行命令
+
+        Args:
+            command: 执行的命令
+
+        Examples:
+            >>> RequestWithOptionalArgs.teardown_exec("sql:xxx")
+            >>> RequestWithOptionalArgs.teardown_exec("redis:xxx")
+            >>> RequestWithOptionalArgs.teardown_exec("mongo:xxx")
+            >>> RequestWithOptionalArgs.teardown_exec("cmd:xxx")
+
+        """
+        self.__step_context.teardown.append(command)
+        return self
+
+    def teardown_sql(self, sql: Text) -> "StepRequestValidation":
+        """ 在接口执行之后执行SQL
+
+        Args:
+            sql: 执行SQL
+
+        Examples:
+            >>> RequestWithOptionalArgs.teardown_sql("select * from mysql")
+
+        """
+        self.__step_context.teardown.append("sql:" + sql)
+        return self
+
+    def teardown_redis(self, redis: Text) -> "StepRequestValidation":
+        """ 在接口执行之后执行redis
+
+        Args:
+            redis: redis命令
+
+        Examples:
+            >>> RequestWithOptionalArgs.teardown_redis("get('key')") # 取出键key对应的值
+            >>> RequestWithOptionalArgs.teardown_redis("hget('name','key')") # 取出hash的key对应的值
+            >>> RequestWithOptionalArgs.teardown_redis("hget('name')") # 取出hash中所有的键值对
+            >>> RequestWithOptionalArgs.teardown_redis("set('key','rrtv')") # 设置key对应的值
+            >>> RequestWithOptionalArgs.teardown_redis("hset('name','key','value')") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
+            >>> RequestWithOptionalArgs.teardown_redis("del('key')") # 删除指定key的键值对
+            >>> RequestWithOptionalArgs.teardown_redis("hdel(name, k)") # 删除hash中键值对
+            >>> RequestWithOptionalArgs.teardown_redis("clean") # 清空redis
+            >>> RequestWithOptionalArgs.teardown_redis("exists(key)","var_name") # 判断key是否存在
+            >>> RequestWithOptionalArgs.teardown_redis("str_get('key')") # 直接调用api
+
+        """
+        self.__step_context.teardown.append("redis:" + redis)
+        return self
+
+    def teardown_mongo(self, mongo: Text) -> "StepRequestValidation":
+        self.__step_context.teardown.append("mongo:" + mongo)
+        return self
+
+    def teardown_cmd(self, command: Text) -> "StepRequestValidation":
+        """ 在接口执行之后执行cmd命令
+
+        Args:
+            command: cmd命令
+
+        Examples:
+            >>> RequestWithOptionalArgs.teardown_cmd("echo 'Hello World !'")
+
+        """
+        self.__step_context.teardown.append("cmd:" + command)
+        return self
+
     def assert_equal(
             self, jmes_path: Text, expected_value: Any, message: Text = ""
     ) -> "StepRequestValidation":
@@ -411,74 +479,6 @@ class RequestWithOptionalArgs(object):
         else:
             self.__step_context.teardown_hooks.append(hook)
 
-        return self
-
-    def teardown_exec(self, command) -> "RequestWithOptionalArgs":
-        """ 在接口执行之后执行命令
-
-        Args:
-            command: 执行的命令
-
-        Examples:
-            >>> RequestWithOptionalArgs.teardown_exec("sql:xxx")
-            >>> RequestWithOptionalArgs.teardown_exec("redis:xxx")
-            >>> RequestWithOptionalArgs.teardown_exec("mongo:xxx")
-            >>> RequestWithOptionalArgs.teardown_exec("cmd:xxx")
-
-        """
-        self.__step_context.teardown.append(command)
-        return self
-
-    def teardown_sql(self, sql: Text) -> "RequestWithOptionalArgs":
-        """ 在接口执行之后执行SQL
-
-        Args:
-            sql: 执行SQL
-
-        Examples:
-            >>> RequestWithOptionalArgs.teardown_sql("select * from mysql")
-
-        """
-        self.__step_context.teardown.append("sql:" + sql)
-        return self
-
-    def teardown_redis(self, redis: Text) -> "RequestWithOptionalArgs":
-        """ 在接口执行之后执行redis
-
-        Args:
-            redis: redis命令
-
-        Examples:
-            >>> RequestWithOptionalArgs.teardown_redis("get('key')") # 取出键key对应的值
-            >>> RequestWithOptionalArgs.teardown_redis("hget('name','key')") # 取出hash的key对应的值
-            >>> RequestWithOptionalArgs.teardown_redis("hget('name')") # 取出hash中所有的键值对
-            >>> RequestWithOptionalArgs.teardown_redis("set('key','rrtv')") # 设置key对应的值
-            >>> RequestWithOptionalArgs.teardown_redis("hset('name','key','value')") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
-            >>> RequestWithOptionalArgs.teardown_redis("del('key')") # 删除指定key的键值对
-            >>> RequestWithOptionalArgs.teardown_redis("hdel(name, k)") # 删除hash中键值对
-            >>> RequestWithOptionalArgs.teardown_redis("clean") # 清空redis
-            >>> RequestWithOptionalArgs.teardown_redis("exists(key)","var_name") # 判断key是否存在
-            >>> RequestWithOptionalArgs.teardown_redis("str_get('key')") # 直接调用api
-
-        """
-        self.__step_context.teardown.append("redis:" + redis)
-        return self
-
-    def teardown_mongo(self, mongo: Text) -> "RequestWithOptionalArgs":
-        self.__step_context.teardown.append("mongo:" + mongo)
-        return self
-
-    def teardown_cmd(self, command: Text) -> "RequestWithOptionalArgs":
-        """ 在接口执行之后执行cmd命令
-
-        Args:
-            command: cmd命令
-
-        Examples:
-            >>> RequestWithOptionalArgs.teardown_cmd("echo 'Hello World !'")
-
-        """
-        self.__step_context.teardown.append("cmd:" + command)
         return self
 
     def extract(self) -> StepRequestExtraction:
