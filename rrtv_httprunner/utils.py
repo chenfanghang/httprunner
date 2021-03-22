@@ -276,13 +276,13 @@ def split_with(str_params) -> Dict:
 
 def get_statement_type(statement: Text) -> Text:
     if isinstance(statement, str):
-        if statement.startswith("sql:"):
+        if statement.lower().startswith("sql:"):
             return "sql"
-        elif statement.startswith("redis:"):
+        elif statement.lower().startswith("redis:"):
             return "redis"
-        elif statement.startswith("mongo:"):
+        elif statement.lower().startswith("mongo:"):
             return "mongo"
-        elif statement.startswith("cmd:"):
+        elif statement.lower().startswith("cmd:"):
             return "cmd"
 
 
@@ -291,13 +291,13 @@ def execute_sql(db: Union[str, dict], sql: Text) -> Text:
     parsed_string = sql[match_start_position + 1:]
     handler = MySQLHandler(db)
     logger.info("execute sql: {" + parsed_string + "}")
-    if parsed_string.startswith("select"):
+    if parsed_string.lower().startswith("select"):
         return handler.query(parsed_string, one=True)
-    elif parsed_string.startswith("insert"):
+    elif parsed_string.lower().startswith("insert"):
         return handler.query(parsed_string, one=True)
-    elif parsed_string.startswith("update"):
+    elif parsed_string.lower().startswith("update"):
         return handler.query(parsed_string, one=True)
-    elif parsed_string.startswith("delete"):
+    elif parsed_string.lower().startswith("delete"):
         return handler.delete(parsed_string)
 
 
@@ -314,19 +314,19 @@ def execute_redis(rd: Union[str, dict], cli: Text) -> Text:
     handler = RedisHandler(rd)
     logger.info("execute redis: { " + parsed_string + " }")
     content = re.findall(r'\'(.*?)\'', str(parsed_string))
-    if parsed_string.startswith("get("):
+    if parsed_string.lower().startswith("get("):
         return handler.str_get(content[0])
-    elif parsed_string.startswith("hget("):
+    elif parsed_string.lower().startswith("hget("):
         handler.hash_getall(content[0]) if len(content) == 1 else handler.hash_get(content[0], content[1])
-    elif parsed_string.startswith("set("):
+    elif parsed_string.lower().startswith("set("):
         return handler.str_set(content[0], content[1])
-    elif parsed_string.startswith("hset("):
+    elif parsed_string.lower().startswith("hset("):
         return handler.hash_set(content[0], content[1], content[2])
-    elif parsed_string.startswith("del("):
+    elif parsed_string.lower().startswith("del("):
         return handler.delete(content[0])
-    elif parsed_string.startswith("hdel("):
+    elif parsed_string.lower().startswith("hdel("):
         return handler.str_set(content[0], content[1])
-    elif parsed_string.startswith("clean") and parsed_string != "clean_redis":
+    elif parsed_string.lower().startswith("clean") and parsed_string != "clean_redis":
         return handler.clean_redis
     else:
         scope = {'handler': RedisHandler(rd)}
