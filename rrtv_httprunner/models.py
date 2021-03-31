@@ -1,6 +1,6 @@
 import os
 from enum import Enum
-from typing import Any
+from typing import Any, Tuple
 from typing import Dict, Text, Union, Callable
 from typing import List
 
@@ -58,6 +58,7 @@ class TRequest(BaseModel):
     headers: Headers = {}
     req_json: Union[Dict, List, Text] = Field(None, alias="json")
     data: Union[Text, Dict[Text, Any]] = None
+    files: Dict[Text, Tuple[Text, Any]] = None
     cookies: Cookies = {}
     timeout: float = 120
     allow_redirects: bool = True

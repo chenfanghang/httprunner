@@ -174,9 +174,13 @@ class HttpSession(requests.Session):
 
         # set stream to True, in order to get client/server IP/Port
         kwargs["stream"] = True
+        # 实现xml传参
         if kwargs["data"] is not None and isinstance(kwargs["data"], str):
             if kwargs["data"].strip().startswith("<xml>") and kwargs["data"].strip().endswith("</xml>"):
                 kwargs["data"] = str(kwargs["data"]).encode("utf-8").decode("latin1")
+        # 实现form-data传参
+        if kwargs["files"] is not None:
+            kwargs["files"] = {k: tuple(v) for k, v in kwargs["files"].items()}
 
         start_timestamp = time.time()
         response = self._send_request_safe_mode(method, url, **kwargs)

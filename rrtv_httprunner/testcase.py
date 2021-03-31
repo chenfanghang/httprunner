@@ -104,10 +104,10 @@ class StepRequestValidation(object):
             command: 执行的命令
 
         Examples:
-            >>> RequestWithOptionalArgs.teardown_exec("sql:xxx")
-            >>> RequestWithOptionalArgs.teardown_exec("redis:xxx")
-            >>> RequestWithOptionalArgs.teardown_exec("mongo:xxx")
-            >>> RequestWithOptionalArgs.teardown_exec("cmd:xxx")
+            >>> StepRequestValidation.teardown_exec("sql:xxx")
+            >>> StepRequestValidation.teardown_exec("redis:xxx")
+            >>> StepRequestValidation.teardown_exec("mongo:xxx")
+            >>> StepRequestValidation.teardown_exec("cmd:xxx")
 
         """
         self.__step_context.teardown.append(command)
@@ -120,7 +120,7 @@ class StepRequestValidation(object):
             sql: 执行SQL
 
         Examples:
-            >>> RequestWithOptionalArgs.teardown_sql("select * from mysql")
+            >>> StepRequestValidation.teardown_sql("select * from mysql")
 
         """
         self.__step_context.teardown.append("sql:" + sql)
@@ -133,16 +133,16 @@ class StepRequestValidation(object):
             redis: redis命令
 
         Examples:
-            >>> RequestWithOptionalArgs.teardown_redis("get('key')") # 取出键key对应的值
-            >>> RequestWithOptionalArgs.teardown_redis("hget('name','key')") # 取出hash的key对应的值
-            >>> RequestWithOptionalArgs.teardown_redis("hget('name')") # 取出hash中所有的键值对
-            >>> RequestWithOptionalArgs.teardown_redis("set('key','rrtv')") # 设置key对应的值
-            >>> RequestWithOptionalArgs.teardown_redis("hset('name','key','value')") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
-            >>> RequestWithOptionalArgs.teardown_redis("del('key')") # 删除指定key的键值对
-            >>> RequestWithOptionalArgs.teardown_redis("hdel(name, k)") # 删除hash中键值对
-            >>> RequestWithOptionalArgs.teardown_redis("clean") # 清空redis
-            >>> RequestWithOptionalArgs.teardown_redis("exists(key)","var_name") # 判断key是否存在
-            >>> RequestWithOptionalArgs.teardown_redis("str_get('key')") # 直接调用api
+            >>> StepRequestValidation.teardown_redis("get('key')") # 取出键key对应的值
+            >>> StepRequestValidation.teardown_redis("hget('name','key')") # 取出hash的key对应的值
+            >>> StepRequestValidation.teardown_redis("hget('name')") # 取出hash中所有的键值对
+            >>> StepRequestValidation.teardown_redis("set('key','rrtv')") # 设置key对应的值
+            >>> StepRequestValidation.teardown_redis("hset('name','key','value')") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
+            >>> StepRequestValidation.teardown_redis("del('key')") # 删除指定key的键值对
+            >>> StepRequestValidation.teardown_redis("hdel(name, k)") # 删除hash中键值对
+            >>> StepRequestValidation.teardown_redis("clean") # 清空redis
+            >>> StepRequestValidation.teardown_redis("exists(key)") # 判断key是否存在
+            >>> StepRequestValidation.teardown_redis("str_get('key')") # 直接调用api
 
         """
         self.__step_context.teardown.append("redis:" + redis)
@@ -159,7 +159,7 @@ class StepRequestValidation(object):
             command: cmd命令
 
         Examples:
-            >>> RequestWithOptionalArgs.teardown_cmd("echo 'Hello World !'")
+            >>> StepRequestValidation.teardown_cmd("echo 'Hello World !'")
 
         """
         self.__step_context.teardown.append("cmd:" + command)
@@ -445,17 +445,28 @@ class RequestWithOptionalArgs(object):
         return self
 
     def with_data(self, data: Dict = None, str_data: Text = None) -> "RequestWithOptionalArgs":
+        self.__step_context.request.headers["Content-Type"] = "text/xml; charset=UTF-8"
         if str_data is not None:
             self.__step_context.request.data = split_with(str_data)
         else:
             self.__step_context.request.data = data
         return self
 
+    def with_formdata(self, data: Dict = None) -> "RequestWithOptionalArgs":
+        """
+        form-data传参
+
+        Example:
+            >>> RequestWithOptionalArgs.with_formdata({"test": (None,"rrtv")})
+        """
+        self.__step_context.request.files = data
+        return self
+
     def with_json(self, req_json) -> "RequestWithOptionalArgs":
         self.__step_context.request.req_json = req_json
         return self
 
-    def set_timeout(self, timeout: float) -> "RequestWithOptionalArgs":
+    def set_timeout(self, timeout: Text) -> "RequestWithOptionalArgs":
         self.__step_context.request.timeout = timeout
         return self
 
