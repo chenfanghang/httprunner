@@ -455,6 +455,16 @@ def parse_data(
                 else:
                     return var_value[suffix] if suffix != [] else var_value
             else:
+                if suffix:
+                    raw_string = var_value.replace(' ', '')
+                    if suffix in raw_string and ":" in raw_string:
+                        match_start_position = raw_string.index(":", 0)
+                        parsed_string = raw_string[match_start_position + 1]
+                        match_content_start_position = raw_string.index("{", 0)
+                        match_content_end_position = raw_string.index("}", 0)
+                        parsed_content_string = raw_string[match_content_start_position:match_content_end_position + 1]
+                        var_value = raw_string.replace(parsed_content_string, parsed_string)
+                        return var_value
                 return var_value
 
     elif isinstance(raw_data, (list, set, tuple)):
