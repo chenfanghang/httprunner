@@ -3,7 +3,7 @@ name = "rrtv-httprunner"
 version = "1.8.2"
 description = "One-stop solution for HTTP(S) testing."
 license = "Apache-2.0"
-#readme = "README.md"
+readme = "README.md"
 authors = ["chenfanghang <chenfanghang@foxmail.com>"]
 
 keywords = ["HTTP", "api", "test", "requests", "locustio"]
