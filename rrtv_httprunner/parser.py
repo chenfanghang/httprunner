@@ -369,7 +369,11 @@ def parse_string(
             suffix_re = re.findall(r'\[\'(.*?)\'\]', raw_string)
             if suffix_re:
                 suffix = suffix_re[0]
-                raw_string = raw_string.split("[")[0]
+                var_value = var_value[suffix]
+                left_string = raw_string.split("[")[0]
+                right_string = raw_string.split("]")[1]
+                full_string = left_string + right_string
+                raw_string = full_string
             if f"${var_name}" == raw_string or "${" + var_name + "}" == raw_string:
                 # raw_string is a variable, $var or ${var}, return its value directly
                 return var_value
