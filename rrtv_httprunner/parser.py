@@ -407,7 +407,7 @@ def parse_data(
     """
     if isinstance(raw_data, str):
         global suffix
-        suffix=[]
+        suffix = []
         # content in string format may contains variables and functions
         variables_mapping = variables_mapping or {}
         functions_mapping = functions_mapping or {}
@@ -450,17 +450,17 @@ def parse_data(
                 match_start_position = raw_data.index("]", 0)
                 parsed_string = raw_data[match_start_position + 1:]
                 if parsed_string != "" or parsed_string is not None:
-                    p=parse_string(parsed_string, variables_mapping, functions_mapping)
+                    p = parse_string(parsed_string, variables_mapping, functions_mapping)
                     if suffix != []:
-                        val=var_value[suffix]
-                        return parse_string_value(str(val)+ str(p))
+                        val = var_value[suffix]
+                        return parse_string_value(str(val) + str(p))
                     else:
                         return parse_string_value(str(var_value) + str(p))
                 else:
                     return var_value[suffix] if suffix != [] else var_value
             else:
                 if suffix:
-                    raw_string = var_value.replace(' ', '')
+                    raw_string = str(var_value).replace(' ', '')
                     if suffix in raw_string and ":" in raw_string:
                         match_start_position = raw_string.index(":", 0)
                         parsed_string = raw_string[match_start_position + 1]
