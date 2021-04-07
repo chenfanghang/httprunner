@@ -461,7 +461,7 @@ def parse_data(
             else:
                 if suffix:
                     raw_string = str(var_value).replace(' ', '')
-                    if suffix in raw_string and ":" in raw_string:
+                    if suffix[0] in raw_string and ":" in raw_string:
                         match_start_position = raw_string.index(":", 0)
                         parsed_string = raw_string[match_start_position + 1]
                         match_content_start_position = raw_string.index("{", 0)
