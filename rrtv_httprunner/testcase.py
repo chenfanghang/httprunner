@@ -445,7 +445,6 @@ class RequestWithOptionalArgs(object):
         return self
 
     def with_data(self, data: Dict = None, str_data: Text = None) -> "RequestWithOptionalArgs":
-        self.__step_context.request.headers["Content-Type"] = "text/xml; charset=UTF-8"
         if str_data is not None:
             self.__step_context.request.data = split_with(str_data)
         else:
