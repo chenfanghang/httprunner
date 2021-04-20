@@ -1,0 +1,45 @@
+appdirs @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/13/9e/45/de9aff042cbd8e14716eb6a553c3eb75e8d313cc1738477a933a926d87/appdirs-1.4.4-py2.py3-none-any.whl
+attrs @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/ae/b3/61/38a043abdba5ba4c0c510dde549dd1c8278bf56262dc5df55c19133a02/attrs-20.3.0-py2.py3-none-any.whl
+black @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/3d/14/6a/f7442c6258ee4199be0c3c6422f41ef29149ee390c5efcb116cd5f1eb5/black-19.10b0-py36-none-any.whl
+certifi @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/db/9d/0a/3683163af3bb7fe252dfa5f98aaa627b305ffe603bfe0bb65ac3224c7a/certifi-2020.12.5-py2.py3-none-any.whl
+chardet @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/f0/e1/66/f8ced421461f1dda06ea89af6ac51a22cf72ff0595f329808634559b2b/chardet-4.0.0-py2.py3-none-any.whl
+click @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/21/fd/0f/f7ff619e0ab099fc284ee2b24a86129d9dc3ad2a475dc304bbbbe20ecb/click-7.1.2-py2.py3-none-any.whl
+coverage @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/17/eb/e6/cf8401310433efa80aae748dcffb85e2a41c853922b519ce4cb703dfa7/coverage-4.5.4-cp37-cp37m-macosx_10_13_x86_64.whl
+fastapi @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/91/df/d1/3abae06ae6d44bc7f13617b1263a42b13475c39b239735689c05a6ef1a/fastapi-0.49.2-py3-none-any.whl
+h11 @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/3a/b8/04/f2968b4a7f594f2677fee63008294312d6b4e7fbf37a2babfd9ff2b2ed/h11-0.9.0-py2.py3-none-any.whl
+httptools @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/71/5d/10/dba13cbe9f0d103e05075f6afa940a08917c816a9886dcac56e0368f3b/httptools-0.1.1-cp37-cp37m-macosx_10_13_x86_64.whl
+idna @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/71/d9/bc/a8481f6ac8b5d0ecc0fbd34aca906ee68d1757f24fefbd0f4294c0c9d2/idna-2.10-py2.py3-none-any.whl
+importlib-metadata @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/53/02/29/21864680657029519619029e22864fd2c924eb719c2f7d60da73387b8c/importlib_metadata-3.4.0-py3-none-any.whl
+Jinja2 @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/47/18/a4/1905063a877fa68496ecb2e347fc04c431948d96cf825a0960da5791e0/Jinja2-2.11.3-py2.py3-none-any.whl
+jmespath @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/64/9c/6e/0803a3493ba7c2887bd5c622eee86cd83712ec7806d3d35e88e6082fa3/jmespath-0.9.5-py2.py3-none-any.whl
+jsonpath==0.82
+loguru @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/e4/13/d7/045680aac4deeecab3107aea5de96d5d321cb0966b0e8cca3ef27d7eb8/loguru-0.4.1-py3-none-any.whl
+MarkupSafe @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/61/56/5d/f36b9a42a230b05480bc740bb30fbad8663ccdaee8946c4bfddab13d92/MarkupSafe-1.1.1-cp37-cp37m-macosx_10_9_x86_64.whl
+more-itertools @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/36/5e/6e/086e365056443ea7340684bae7e448349db3e9ed8be4d1f089f351b2e2/more_itertools-8.7.0-py3-none-any.whl
+packaging @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/bf/c9/4b/d4c56a8494978126d690da73a04dfe71b97fa991e52f1634afc46f263e/packaging-20.9-py2.py3-none-any.whl
+pathspec @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/d3/5f/9e/9c6b0f740c5d2430d10e5d6f50db88d8ffaab034156351d3fb698bd3c5/pathspec-0.8.1-py2.py3-none-any.whl
+pluggy @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/bc/2e/c9/c04063460a7a68d2e59c9ea0a673de9d7930d54f788ed0510cdcf8aa78/pluggy-0.13.1-py2.py3-none-any.whl
+py @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/56/1d/e3/7dad75e1bf797fbd8937b37dd43d1656357c67a199e9f54d48535697d0/py-1.10.0-py2.py3-none-any.whl
+pydantic @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/0b/cc/b0/1a073b13efe348a3149c603e2e6a4d46f59a92f407f683985cbd6614d6/pydantic-1.7.3-cp37-cp37m-macosx_10_9_x86_64.whl
+pymongo==3.11.3
+PyMySQL==1.0.2
+pyparsing @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/78/8b/03/23dc60df50f099a658dd13c86d7d94564b0b86bfa2ff61bc9595fb2fcb/pyparsing-2.4.7-py2.py3-none-any.whl
+pytest @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/a8/5a/78/7536a0da5c14b85637968b588ecf3bde096ce084658eab4180c94412fa/pytest-5.4.3-py3-none-any.whl
+pytest-html @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/07/a6/01/60622637b5b1ceeb3cd42cf55b586b356108d67934f29cbe5e8b026b21/pytest_html-2.1.1-py2.py3-none-any.whl
+pytest-metadata @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/f8/3c/a5/c0302ba8ede3cce20000317e9dc5871ce63e51c19043cd0539a808feeb/pytest_metadata-1.11.0-py2.py3-none-any.whl
+PyYAML @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/c8/9b/5e/bebd5b4f1f47a1902ce8f79396df1826adc6b65d232351823b00e2e45c/PyYAML-5.4.1-cp37-cp37m-macosx_10_9_x86_64.whl
+redis==3.5.3
+regex @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/40/99/ee/064580b552a1f7043714aac9f3ee22ee9bc8b7cd168943a7ecac8ec644/regex-2020.11.13-cp37-cp37m-macosx_10_9_x86_64.whl
+requests @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/f2/13/b8/cc7ac8d0aa2630507c04c2c0e72307bed4ee7e2c92d7c3d97a5d61e74e/requests-2.25.1-py2.py3-none-any.whl
+sentry-sdk @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/1b/e0/cf/8f63eae331cfd325a12217f61da6a508af441a594d7a165f9ab2dd874e/sentry_sdk-0.14.4-py2.py3-none-any.whl
+six @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/e3/96/48/99c14ba5c6276fbf4dc2e216553590ec97b52e685863f73e39550418c5/six-1.15.0-py2.py3-none-any.whl
+starlette @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/d4/f0/26/238e816e558a26d82f1d831574878569c9720afd3bfd3739552e897ed2/starlette-0.12.9.tar.gz
+toml @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/4f/28/bf/d86336a479a830a4e11505920e408af09c2f5c129c3b59500aa93387fb/toml-0.10.2-py2.py3-none-any.whl
+typed-ast @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/f8/03/76/f746d3ef80a2ef2c4167b686b0635bed9973ace130292b64aefbda7c0b/typed_ast-1.4.2-cp37-cp37m-macosx_10_9_x86_64.whl
+typing-extensions @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/5a/dd/8f/5dc09cb3732cb0be9ecae5854eaa6aa0d4cd95752163c65283ecf9bd34/typing_extensions-3.7.4.3-py3-none-any.whl
+urllib3 @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/d3/15/58/ba0060fd151d504925968671fc1e2ef7dc6129dd72b1a05b5c60394919/urllib3-1.26.3-py2.py3-none-any.whl
+uvicorn @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/01/f1/12/5b539693c03fa761604124660ca37413062f5c784c5ae7158b70f9afdf/uvicorn-0.11.8-py3-none-any.whl
+uvloop @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/23/6b/fe/05822367b554eef9ae97275ba1b1e821351038ed536f31dfc09a0be2a8/uvloop-0.15.1-cp37-cp37m-macosx_10_14_x86_64.whl
+wcwidth @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/92/12/86/71fde978823bd982c22bd549b0ba688e372403269396c892ac8160f4fe/wcwidth-0.2.5-py2.py3-none-any.whl
+websockets @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/a8/01/06/60ce10dbca642dfa5385f746b6bde66435a17eb9fa4df9b981b3f04f9a/websockets-8.0.2-cp37-cp37m-macosx_10_6_intel.whl
+zipp @ file:///Users/chenfanghang/Library/Caches/pypoetry/artifacts/47/ee/1d/76a3e6ccf129bb715b25f36d98f73ea147d20c604bd264ce54a3e22808/zipp-3.4.0-py3-none-any.whl
