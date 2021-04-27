@@ -19,7 +19,10 @@ dolloar_regex_compile = re.compile(r"\$\$")
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
 function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\.\-/\s=,]*)\)\}")
+suffix_regex_compile1= re.compile(r"\[\'(.*?)\'\]")
+suffix_regex_compile2= "\[(.*?)\]"
 suffix = []
+suffix2 = []
 
 
 def parse_string_value(str_value: Text) -> Any:
@@ -366,9 +369,15 @@ def parse_string(
             var_name = var_match.group(1) or var_match.group(2)
             var_value = get_mapping_variable(var_name, variables_mapping)
             global suffix
+            global suffix2
             suffix_re = re.findall(r'\[\'(.*?)\'\]', raw_string)
+            if suffix_re == []:
+                suffix_re = re.findall(r"\[(.*?)\]", str(raw_string))
             if suffix_re:
-                suffix = suffix_re[0]
+                if suffix_re[-1]=="]":
+                    suffix2 = suffix_re[0]
+                else:
+                    suffix = suffix_re[0]
                 var_value = var_value[suffix]
                 left_string = raw_string.split("[")[0]
                 right_string = raw_string.split("]")[1]
@@ -407,29 +416,35 @@ def parse_data(
     """
     if isinstance(raw_data, str):
         global suffix
-        suffix = []
+        global suffix2
+        # suffix = []
         # content in string format may contains variables and functions
         variables_mapping = variables_mapping or {}
         functions_mapping = functions_mapping or {}
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
         var_value = parse_string(raw_data, variables_mapping, functions_mapping)
-        suffix_re = re.findall(r'\[\'(.*?)\'\]', str(var_value))
-        if suffix_re:
-            suffix = suffix_re[0]
+        # suffix_re = re.findall(r'\[\'(.*?)\'\]', str(var_value))
+        # if suffix_re == []:
+        #     suffix_re = re.findall(r"\[(.*?)\]", str(var_value))
+        # if suffix_re:
+        #     suffix = suffix_re[0]
 
         if get_statement_type(var_value) == "sql":
+            print(suffix)
+            print(type(suffix))
             try:
                 value = execute_sql(variables_mapping["mysql"], var_value)
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("mysql datasource not configured")
+            print(value)
             if value is None:  # 如果为None说明非select方法
                 return var_value  # 直接返回原字符串
-            elif not suffix:  # 没有suffix后缀
+            elif suffix2==[] or suffix2=="":  # 没有suffix后缀
                 return value
             else:
                 try:
-                    return value[suffix]
+                    return value[suffix2]
                 except KeyError:
                     raise exceptions.SuffixError("suffix name error")
         elif get_statement_type(var_value) == "cmd":
@@ -451,17 +466,17 @@ def parse_data(
                 parsed_string = raw_data[match_start_position + 1:]
                 if parsed_string != "" or parsed_string is not None:
                     p = parse_string(parsed_string, variables_mapping, functions_mapping)
-                    if suffix != []:
-                        val = var_value[suffix]
+                    if suffix2 != []:
+                        val = var_value[suffix2]
                         return parse_string_value(str(val) + str(p))
                     else:
                         return parse_string_value(str(var_value) + str(p))
                 else:
-                    return var_value[suffix] if suffix != [] else var_value
+                    return var_value[suffix2] if suffix2 != [] else var_value
             else:
-                if suffix:
+                if suffix2:
                     raw_string = str(var_value).replace(' ', '')
-                    if suffix[0] in raw_string and ":" in raw_string:
+                    if suffix2[0] in raw_string and ":" in raw_string:
                         match_start_position = raw_string.index(":", 0)
                         parsed_string = raw_string[match_start_position + 1]
                         match_content_start_position = raw_string.index("{", 0)
