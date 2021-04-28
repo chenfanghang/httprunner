@@ -19,6 +19,8 @@ dolloar_regex_compile = re.compile(r"\$\$")
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
 function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\.\-/\s=,]*)\)\}")
+suffix_regex_compile1= re.compile(r"\[\'(.*?)\'\]")
+suffix_regex_compile2= "\[(.*?)\]"
 suffix = []
 suffix2 = []
 
@@ -369,7 +371,7 @@ def parse_string(
             global suffix
             global suffix2
             suffix_re = re.findall(r'\[\'(.*?)\'\]', raw_string)
-            if not suffix_re:
+            if suffix_re == []:
                 suffix_re = re.findall(r"\[(.*?)\]", str(raw_string))
             if suffix_re:
                 if suffix_re[-1]=="]":
@@ -422,6 +424,11 @@ def parse_data(
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
         var_value = parse_string(raw_data, variables_mapping, functions_mapping)
+        # suffix_re = re.findall(r'\[\'(.*?)\'\]', str(var_value))
+        # if suffix_re == []:
+        #     suffix_re = re.findall(r"\[(.*?)\]", str(var_value))
+        # if suffix_re:
+        #     suffix = suffix_re[0]
 
         if get_statement_type(var_value) == "sql":
             try:

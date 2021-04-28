@@ -199,6 +199,7 @@ class ResponseObject(object):
             field_value = self._search_jmespath(field)
             if field_value == field:  # if not jmespath syntax
                 field_value = parse_data(field, variables_mapping, functions_mapping)
+                variables_mapping[key] = field_value
 
             extract_mapping[key] = field_value
 
