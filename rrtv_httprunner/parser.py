@@ -427,11 +427,6 @@ def parse_data(
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
         var_value = parse_string(raw_data, variables_mapping, functions_mapping)
-        # suffix_re = re.findall(r'\[\'(.*?)\'\]', str(var_value))
-        # if suffix_re == []:
-        #     suffix_re = re.findall(r"\[(.*?)\]", str(var_value))
-        # if suffix_re:
-        #     suffix = suffix_re[0]
 
         if get_statement_type(var_value) == "sql":
             try:
@@ -462,17 +457,21 @@ def parse_data(
         else:
 
             if isinstance(var_value, dict):
-                match_start_position = raw_data.index("]", 0)
-                parsed_string = raw_data[match_start_position + 1:]
-                if parsed_string != "" or parsed_string is not None:
-                    p = parse_string(parsed_string, variables_mapping, functions_mapping)
-                    if suffix2 != []:
-                        val = var_value[suffix2]
-                        return parse_string_value(str(val) + str(p))
+                if suffix2 != []:
+                    match_start_position = raw_data.index("]", 0)
+                    parsed_string = raw_data[match_start_position + 1:]
+                    if parsed_string != "" or parsed_string is not None:
+                        p = parse_string(parsed_string, variables_mapping, functions_mapping)
+                        if suffix2 != []:
+                            val = var_value[suffix2]
+                            return parse_string_value(str(val) + str(p))
+                        else:
+                            return parse_string_value(str(var_value) + str(p))
                     else:
-                        return parse_string_value(str(var_value) + str(p))
+                        return var_value[suffix2] if suffix2 != [] else var_value
                 else:
-                    return var_value[suffix2] if suffix2 != [] else var_value
+                    return var_value
+
             else:
                 if suffix2:
                     raw_string = str(var_value).replace(' ', '')
