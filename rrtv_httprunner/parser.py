@@ -18,9 +18,9 @@ dolloar_regex_compile = re.compile(r"\$\$")
 # variable notation, e.g. ${var} or $var
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
-function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\.\-/\s=,]*)\)\}")
-suffix_regex_compile1= re.compile(r"\[\'(.*?)\'\]")
-suffix_regex_compile2= "\[(.*?)\]"
+function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\;\:\*\.\-/\s=,]*)\)\}")
+suffix_regex_compile1 = re.compile(r"\[\'(.*?)\'\]")
+suffix_regex_compile2 = "\[(.*?)\]"
 suffix = []
 suffix2 = []
 
@@ -164,7 +164,7 @@ def extract_variables(content: Any) -> Set:
     return set()
 
 
-def parse_function_params(params: Text) -> Dict:
+def parse_function_params(params: Text, func_name: Text) -> Dict:
     """ parse function params to args and kwargs.
 
     Args:
@@ -204,10 +204,13 @@ def parse_function_params(params: Text) -> Dict:
     args_list = params_str.split(",")
     for arg in args_list:
         arg = arg.strip()
-        if "=" in arg:
-            key, value = arg.split("=")
+
+        if "=" in arg and "sql" not in func_name and "redis" not in func_name and "mongo" not in func_name and "cmd" not in func_name:
+            key, value = arg.split("=", 1)
             function_meta["kwargs"][key.strip()] = parse_string_value(value.strip())
         else:
+            # if arg.startswith("sql:"):
+            #     arg = arg.split("sql:")[1]
             function_meta["args"].append(parse_string_value(arg))
 
     return function_meta
@@ -335,7 +338,7 @@ def parse_string(
             func = get_mapping_function(func_name, functions_mapping)
 
             func_params_str = func_match.group(2)
-            function_meta = parse_function_params(func_params_str)
+            function_meta = parse_function_params(func_params_str, func_name)
             args = function_meta["args"]
             kwargs = function_meta["kwargs"]
             parsed_args = parse_data(args, variables_mapping, functions_mapping)
@@ -374,7 +377,7 @@ def parse_string(
             if suffix_re == []:
                 suffix_re = re.findall(r"\[(.*?)\]", str(raw_string))
             if suffix_re:
-                if suffix_re[-1]=="]":
+                if suffix_re[-1] == "]":
                     suffix2 = suffix_re[0]
                 else:
                     suffix = suffix_re[0]
@@ -437,7 +440,7 @@ def parse_data(
                 raise exceptions.DBError("mysql datasource not configured")
             if value is None:  # 如果为None说明非select方法
                 return var_value  # 直接返回原字符串
-            elif suffix2==[] or suffix2=="":  # 没有suffix后缀
+            elif suffix2 == [] or suffix2 == "":  # 没有suffix后缀
                 return value
             else:
                 try:
