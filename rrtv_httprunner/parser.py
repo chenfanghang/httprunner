@@ -5,11 +5,10 @@ import re
 from typing import Any, Set, Text, Callable, List, Dict
 
 from loguru import logger
-from sentry_sdk import capture_exception
-
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
 from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis, execute_mongo
+from sentry_sdk import capture_exception
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -18,7 +17,7 @@ dolloar_regex_compile = re.compile(r"\$\$")
 # variable notation, e.g. ${var} or $var
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
-function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\;\:\*\.\-/\s=,]*)\)\}")
+function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\;\!\:\*\.\-/\s=,]*)\)\}")
 suffix_regex_compile1 = re.compile(r"\[\'(.*?)\'\]")
 suffix_regex_compile2 = "\[(.*?)\]"
 suffix = []
@@ -206,8 +205,8 @@ def parse_function_params(params: Text, func_name: Text) -> Dict:
         arg = arg.strip()
 
         if "=" in arg and "sql" not in func_name and "redis" not in func_name and "mongo" not in func_name and "cmd" not in func_name:
-            key, value = arg.split("=", 1)
-            function_meta["kwargs"][key.strip()] = parse_string_value(value.strip())
+                key, value = arg.split("=", 1)
+                function_meta["kwargs"][key.strip()] = parse_string_value(value.strip())
         else:
             # if arg.startswith("sql:"):
             #     arg = arg.split("sql:")[1]
@@ -427,6 +426,11 @@ def parse_data(
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
         var_value = parse_string(raw_data, variables_mapping, functions_mapping)
+        # suffix_re = re.findall(r'\[\'(.*?)\'\]', str(var_value))
+        # if suffix_re == []:
+        #     suffix_re = re.findall(r"\[(.*?)\]", str(var_value))
+        # if suffix_re:
+        #     suffix = suffix_re[0]
 
         if get_statement_type(var_value) == "sql":
             try:

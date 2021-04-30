@@ -183,6 +183,11 @@ class HttpRunner(object):
         prepare_upload_step(step, self.__project_meta.functions)
         request_dict = step.request.dict()
         request_dict.pop("upload", None)
+
+        # setup hooks
+        if step.setup_hooks:
+            self.__call_hooks(step.setup_hooks, step.variables, "setup request")
+
         parsed_request_dict = parse_data(
             request_dict, step.variables, self.__project_meta.functions
         )
@@ -191,10 +196,6 @@ class HttpRunner(object):
             f"HRUN-{self.__case_id}-{str(int(time.time() * 1000))[-6:]}",
         )
         step.variables["request"] = parsed_request_dict
-
-        # setup hooks
-        if step.setup_hooks:
-            self.__call_hooks(step.setup_hooks, step.variables, "setup request")
 
         variables_mapping = step.variables
         # variables_mapping.update(extract_mapping)
