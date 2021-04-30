@@ -6,10 +6,19 @@ from loguru import logger
 from pymongo import MongoClient
 
 
+def find_last_index(string: Text, expected_str: Text) -> int:
+    last_position = -1
+    while True:
+        position = string.find(expected_str, last_position + 1)
+        if position == -1:
+            return last_position
+        last_position = position
+
+
 class MongoHandler:
-    def __init__(self, driver: Text, database: Text):
+    def __init__(self, driver: Text):
         self.client = MongoClient(driver)
-        self.db = self.client[database]
+        self.db = self.client[driver[find_last_index(driver, "/") + 1:find_last_index(driver, "?")]]
 
     def get_state(self):
         return self.client is not None and self.db is not None

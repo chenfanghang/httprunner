@@ -338,6 +338,6 @@ def execute_mongo(db: Union[str, dict], operation: Text) -> Text:
     match_start_position = operation.index(":", 0)
     parsed_string = operation[match_start_position + 1:]
     logger.info("execute mongodb: { " + parsed_string + " }")
-    scope = {'handler': MongoHandler(db["driver"], db["database"])}
+    scope = {'handler': MongoHandler(db)}
     cli = "handler." + parsed_string
     return eval(cli, scope)
