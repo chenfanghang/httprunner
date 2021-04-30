@@ -136,7 +136,7 @@ class HttpRunner(object):
 
     def __execute(self, aspect: Text, step: TStep, variables_mapping=None,
                   functions_mapping=None, ) -> NoReturn:
-        need_configured_attr = ["mysql", "redis", "mongodb"]
+        need_configured_attr = ["mysql", "redis", "mongo"]
         not_need_configured_attr = ["cmd"]
         has_attr = False
         for attr in need_configured_attr:  # 判断是否有数据源
