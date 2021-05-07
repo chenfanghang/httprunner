@@ -341,3 +341,23 @@ def execute_mongo(db: Union[str, dict], operation: Text) -> Text:
     scope = {'handler': MongoHandler(db)}
     cli = "handler." + parsed_string
     return eval(cli, scope)
+
+
+def remove_bracket(word):
+    if "[" not in word and "]" not in word:
+        return word
+    data1 = word.find("[")
+    data2 = word.find("]")
+    left = word[:data1]
+    right = word[data2 + 1:]
+    word = left + right
+    return remove_bracket(word)
+
+
+def remove_bracket_first(word):
+    data1 = word.find("[")
+    data2 = word.find("]")
+    left = word[:data1]
+    right = word[data2 + 1:]
+    word = left + right
+    return word

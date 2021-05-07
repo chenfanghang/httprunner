@@ -5,10 +5,12 @@ import re
 from typing import Any, Set, Text, Callable, List, Dict
 
 from loguru import logger
+from sentry_sdk import capture_exception
+
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
-from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis, execute_mongo
-from sentry_sdk import capture_exception
+from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis, execute_mongo, \
+    remove_bracket_first
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -19,8 +21,9 @@ variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
 # function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\;\!\:\*\.\-/\s=,]*)\)\}")
 function_regex_compile = re.compile(r"\$\{(\w+)\(((?!\$\{).*)\)\}")
-suffix_regex_compile1 = re.compile(r"\[\'(.*?)\'\]")
-suffix_regex_compile2 = "\[(.*?)\]"
+
+suffix_regex_compile1 = r'\[\'(.*?)\'\]'
+suffix_regex_compile2 = r"\[(.*?)\]"
 suffix = []
 suffix2 = []
 
@@ -206,8 +209,8 @@ def parse_function_params(params: Text, func_name: Text) -> Dict:
         arg = arg.strip()
 
         if "=" in arg and "sql" not in func_name and "redis" not in func_name and "mongo" not in func_name and "cmd" not in func_name:
-                key, value = arg.split("=", 1)
-                function_meta["kwargs"][key.strip()] = parse_string_value(value.strip())
+            key, value = arg.split("=", 1)
+            function_meta["kwargs"][key.strip()] = parse_string_value(value.strip())
         else:
             # if arg.startswith("sql:"):
             #     arg = arg.split("sql:")[1]
@@ -373,19 +376,21 @@ def parse_string(
             var_value = get_mapping_variable(var_name, variables_mapping)
             global suffix
             global suffix2
-            suffix_re = re.findall(r'\[\'(.*?)\'\]', raw_string)
-            if suffix_re == []:
-                suffix_re = re.findall(r"\[(.*?)\]", str(raw_string))
+            suffix_re = re.findall(var_name + suffix_regex_compile1, raw_string)
+            if not suffix_re:
+                suffix_re = re.findall(var_name + suffix_regex_compile2, str(raw_string))
             if suffix_re:
                 if suffix_re[-1] == "]":
                     suffix2 = suffix_re[0]
                 else:
                     suffix = suffix_re[0]
-                var_value = var_value[suffix]
-                left_string = raw_string.split("[")[0]
-                right_string = raw_string.split("]")[1]
-                full_string = left_string + right_string
+                if isinstance(var_value, Text) or isinstance(var_value, int):
+                    var_value = var_value
+                else:
+                    var_value = var_value[suffix]
+                full_string = remove_bracket_first(raw_string)
                 raw_string = full_string
+
             if f"${var_name}" == raw_string or "${" + var_name + "}" == raw_string:
                 # raw_string is a variable, $var or ${var}, return its value directly
                 return var_value
@@ -427,11 +432,6 @@ def parse_data(
         # only strip whitespaces and tabs, \n\r is left because they maybe used in changeset
         raw_data = raw_data.strip(" \t")
         var_value = parse_string(raw_data, variables_mapping, functions_mapping)
-        # suffix_re = re.findall(r'\[\'(.*?)\'\]', str(var_value))
-        # if suffix_re == []:
-        #     suffix_re = re.findall(r"\[(.*?)\]", str(var_value))
-        # if suffix_re:
-        #     suffix = suffix_re[0]
 
         if get_statement_type(var_value) == "sql":
             try:
@@ -462,12 +462,12 @@ def parse_data(
         else:
 
             if isinstance(var_value, dict):
-                if suffix2 != []:
+                if suffix2:
                     match_start_position = raw_data.index("]", 0)
                     parsed_string = raw_data[match_start_position + 1:]
                     if parsed_string != "" or parsed_string is not None:
                         p = parse_string(parsed_string, variables_mapping, functions_mapping)
-                        if suffix2 != []:
+                        if suffix2:
                             val = var_value[suffix2]
                             return parse_string_value(str(val) + str(p))
                         else:
