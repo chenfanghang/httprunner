@@ -435,7 +435,10 @@ def parse_data(
 
         if get_statement_type(var_value) == "sql":
             try:
-                value = execute_sql(variables_mapping["mysql"], var_value)
+                if "&&db:" in var_value:
+                    value = execute_sql(var_value.split("&&db:")[1], var_value.split("&&db:")[0])
+                else:
+                    value = execute_sql(variables_mapping["mysql"], var_value)
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("mysql datasource not configured")
             if value is None:  # 如果为None说明非select方法
