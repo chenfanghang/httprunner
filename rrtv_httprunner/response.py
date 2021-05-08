@@ -202,6 +202,7 @@ class ResponseObject(object):
                 variables_mapping[key] = field_value
 
             extract_mapping[key] = field_value
+            variables_mapping.update(extract_mapping)
 
         logger.info(f"extract mapping: {extract_mapping}")
         return extract_mapping
