@@ -148,7 +148,7 @@ class HttpRunner(object):
             if not has_attr:
                 for attr in not_need_configured_attr:  # 判断是否有数据源
                     for setup in step.setup:
-                        if attr in setup:
+                        if "&&db:" in setup:
                             has_attr = True
                             break
 
@@ -163,7 +163,7 @@ class HttpRunner(object):
             if not has_attr:
                 for attr in not_need_configured_attr:  # 判断是否有数据源
                     for teardown in step.teardown:
-                        if attr in teardown:
+                        if "&&db:" in teardown:
                             has_attr = True
                             break
 
