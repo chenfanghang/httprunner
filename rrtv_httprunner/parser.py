@@ -442,7 +442,7 @@ def parse_data(
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("mysql datasource not configured")
             if value is None:  # 如果为None说明非select方法
-                return var_value  # 直接返回原字符串
+                return None  # 直接返回原字符串
             elif suffix2 == [] or suffix2 == "":  # 没有suffix后缀
                 return value
             else:
