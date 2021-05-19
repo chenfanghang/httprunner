@@ -196,7 +196,7 @@ class ResponseObject(object):
 
         extract_mapping = {}
         for key, field in extractors.items():
-            field_value = self._search_jmespath(field)
+            field_value = self._search_jmespath(parse_data(field, variables_mapping, functions_mapping))
             if field_value == field:  # if not jmespath syntax
                 field_value = parse_data(field, variables_mapping, functions_mapping)
                 variables_mapping[key] = field_value
