@@ -4,7 +4,6 @@ import jmespath
 import requests
 from jmespath.exceptions import JMESPathError
 from loguru import logger
-
 from rrtv_httprunner import exceptions
 from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
 from rrtv_httprunner.models import VariablesMapping, Validators, FunctionsMapping
@@ -170,6 +169,7 @@ class ResponseObject(object):
             "cookies": self.cookies,
             "body": self.body,
         }
+        if expr is None: return None
         try:
             key_list = [key for key in resp_obj_meta.keys()]
             flag = False
