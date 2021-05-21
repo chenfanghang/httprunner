@@ -5,12 +5,11 @@ import re
 from typing import Any, Set, Text, Callable, List, Dict
 
 from loguru import logger
-from sentry_sdk import capture_exception
-
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
 from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis, execute_mongo, \
     remove_bracket_first
+from sentry_sdk import capture_exception
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -387,7 +386,10 @@ def parse_string(
                 if isinstance(var_value, Text) or isinstance(var_value, int):
                     var_value = var_value
                 else:
-                    var_value = var_value[suffix]
+                    if var_value is not None:
+                        var_value = var_value[suffix]
+                    else:
+                        return var_value
                 full_string = remove_bracket_first(raw_string)
                 raw_string = full_string
 
