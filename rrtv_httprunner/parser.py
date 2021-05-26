@@ -545,8 +545,11 @@ def parse_variables_mapping(
 
             try:
                 parsed_value = parse_data(
-                    var_value, parsed_variables, functions_mapping
+                    var_value, variables_mapping, functions_mapping
                 )
+                # parsed_value = parse_data(
+                #     var_value, parsed_variables, functions_mapping
+                # )
             except exceptions.VariableNotFound:
                 continue
 

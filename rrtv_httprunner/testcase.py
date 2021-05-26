@@ -525,7 +525,7 @@ class RunRequest(object):
         self.__step_context.setup.append(command)
         return self
 
-    def setup_sql(self, sql: Text) -> "RunRequest":
+    def setup_sql(self, sql: Text, assign_var_name: Text = None) -> "RunRequest":
         """ 在接口执行之前执行SQL
 
         Args:
@@ -535,7 +535,10 @@ class RunRequest(object):
             >>> RunRequest.setup_sql("select * from mysql")
 
         """
-        self.__step_context.setup.append("sql:" + sql)
+        if assign_var_name is not None:
+            self.__step_context.setup.append("sql:" + sql + "##" + assign_var_name)
+        else:
+            self.__step_context.setup.append("sql:" + sql)
         return self
 
     def setup_redis(self, redis: Text) -> "RunRequest":
