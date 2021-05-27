@@ -144,30 +144,54 @@ class StepRequestValidation(object):
                 self.__step_context.teardown.append("sql:" + str(var))
         return self
 
-    def teardown_redis(self, redis: Text) -> "StepRequestValidation":
+    def teardown_redis(self, var: Union[Text, List], assign_var_name: Text = None) -> "StepRequestValidation":
         """ 在接口执行之后执行redis
 
         Args:
-            redis: redis命令
+            var: 执行SQL
+            assign_var_name: 变量名
 
         Examples:
-            >>> StepRequestValidation.teardown_redis("get('key')") # 取出键key对应的值
-            >>> StepRequestValidation.teardown_redis("hget('name','key')") # 取出hash的key对应的值
-            >>> StepRequestValidation.teardown_redis("hget('name')") # 取出hash中所有的键值对
+            >>> StepRequestValidation.teardown_redis("get('key')","var_name") # 取出键key对应的值
+            >>> StepRequestValidation.teardown_redis("hget('name','key')","var_name") # 取出hash的key对应的值
+            >>> StepRequestValidation.teardown_redis("hget('name')","var_name") # 取出hash中所有的键值对
+            >>> StepRequestValidation.teardown_redis("hkeys('name')","var_name") # 取出hash中所有的键值对
             >>> StepRequestValidation.teardown_redis("set('key','rrtv')") # 设置key对应的值
             >>> StepRequestValidation.teardown_redis("hset('name','key','value')") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
             >>> StepRequestValidation.teardown_redis("del('key')") # 删除指定key的键值对
             >>> StepRequestValidation.teardown_redis("hdel(name, k)") # 删除hash中键值对
             >>> StepRequestValidation.teardown_redis("clean") # 清空redis
             >>> StepRequestValidation.teardown_redis("exists(key)") # 判断key是否存在
-            >>> StepRequestValidation.teardown_redis("str_get('key')") # 直接调用api
+            >>> StepRequestValidation.teardown_redis("str_get('key')","var_name") # 直接调用api
 
         """
-        self.__step_context.teardown.append("redis:" + redis)
+        if isinstance(var, List):
+            # 指定环境场景
+            db, cli = var[0], var[1]
+            if assign_var_name is not None:
+                self.__step_context.teardown.append("redis:" + str(cli) + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.teardown.append("redis:" + str(cli) + "&&db:" + str(db))
+        else:
+            if assign_var_name is not None:
+                self.__step_context.teardown.append("redis:" + str(var) + "##" + assign_var_name)
+            else:
+                self.__step_context.teardown.append("redis:" + str(var))
         return self
 
-    def teardown_mongo(self, mongo: Text) -> "StepRequestValidation":
-        self.__step_context.teardown.append("mongo:" + mongo)
+    def teardown_mongo(self, mongo: Union[Text, List], assign_var_name: Text = None) -> "StepRequestValidation":
+        if isinstance(mongo, List):
+            # 指定环境场景
+            db, cli = mongo[0], mongo[1]
+            if assign_var_name is not None:
+                self.__step_context.teardown.append("mongo:" + str(cli) + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.teardown.append("mongo:" + str(cli) + "&&db:" + str(db))
+        else:
+            if assign_var_name is not None:
+                self.__step_context.teardown.append("mongo:" + str(mongo) + "##" + assign_var_name)
+            else:
+                self.__step_context.teardown.append("mongo:" + str(mongo))
         return self
 
     def teardown_cmd(self, command: Text) -> "StepRequestValidation":
@@ -409,7 +433,7 @@ class StepRequestExtraction(object):
             self.__step_context.teardown.append("sql:" + str(var) + "##" + var_name)
         return self
 
-    def with_redis(self, redis: Text, var_name: Text) -> "StepRequestExtraction":
+    def with_redis(self, redis: Union[Text, List], var_name: Text = None) -> "StepRequestExtraction":
         """
 
         Args:
@@ -429,11 +453,21 @@ class StepRequestExtraction(object):
             >>> StepRequestExtraction.with_redis("str_get('key')","var_name") # 直接调用api
 
         """
-        self.__step_context.extract[var_name] = "redis:" + redis
+        if isinstance(redis, List):
+            # 指定环境场景
+            db, cli = redis[0], redis[1]
+            self.__step_context.extract[var_name] = "redis:" + str(cli) + "&&db:" + str(db) + "##" + var_name
+        else:
+            self.__step_context.extract[var_name] = "redis:" + str(redis) + "##" + var_name
         return self
 
     def with_mongo(self, mongo: Text, var_name: Text) -> "StepRequestExtraction":
-        self.__step_context.extract[var_name] = "mongo:" + mongo
+        if isinstance(mongo, List):
+            # 指定环境场景
+            db, cli = mongo[0], mongo[1]
+            self.__step_context.extract[var_name] = "mongo:" + str(cli) + "&&db:" + str(db) + "##" + var_name
+        else:
+            self.__step_context.extract[var_name] = "mongo:" + str(mongo) + "##" + var_name
         return self
 
     # def with_regex(self):
@@ -579,43 +613,64 @@ class RunRequest(object):
             # 指定环境场景
             db, sql = var[0], var[1]
             if assign_var_name is not None:
-                # 存储变量
                 self.__step_context.setup.append("sql:" + str(sql) + "&&db:" + str(db) + "##" + assign_var_name)
             else:
                 self.__step_context.setup.append("sql:" + str(sql) + "&&db:" + str(db))
         else:
             if assign_var_name is not None:
-                # 存储变量
                 self.__step_context.setup.append("sql:" + str(var) + "##" + assign_var_name)
             else:
                 self.__step_context.setup.append("sql:" + str(var))
         return self
 
-    def setup_redis(self, redis: Text) -> "RunRequest":
+    def setup_redis(self, redis: Union[Text, List], assign_var_name: Text = None) -> "RunRequest":
         """ 在接口执行之前执行redis
 
         Args:
             redis: redis命令
+            assign_var_name: 变量名
 
         Examples:
-            >>> RunRequest.setup_redis("get('key')") # 取出键key对应的值
-            >>> RunRequest.setup_redis("hget('name','key')") # 取出hash的key对应的值
-            >>> RunRequest.setup_redis("hget('name')") # 取出hash中所有的键值对
+            >>> RunRequest.setup_redis("get('key')","var_name") # 取出键key对应的值
+            >>> RunRequest.setup_redis("hget('name','key')","var_name") # 取出hash的key对应的值
+            >>> RunRequest.setup_redis("hget('name')","var_name") # 取出hash中所有的键值对
+            >>> RunRequest.setup_redis("hkeys('name')","var_name") # 取出hash中所有的键值对
             >>> RunRequest.setup_redis("set('key','rrtv')") # 设置key对应的值
             >>> RunRequest.setup_redis("hset('name','key','value')") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
             >>> RunRequest.setup_redis("del('key')") # 删除指定key的键值对
             >>> RunRequest.setup_redis("hdel(name, k)") # 删除hash中键值对
             >>> RunRequest.setup_redis("clean") # 清空redis
             >>> RunRequest.setup_redis("exists(key)") # 判断key是否存在
-            >>> RunRequest.setup_redis("str_get('key')") # 直接调用api
+            >>> RunRequest.setup_redis("str_get('key')","var_name") # 直接调用api
 
         """
-        self.__step_context.setup.append("redis:" + redis)
+        if isinstance(redis, List):
+            # 指定环境场景
+            db, cli = redis[0], redis[1]
+            if assign_var_name is not None:
+                self.__step_context.setup.append("redis:" + str(cli) + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.setup.append("redis:" + str(cli) + "&&db:" + str(db))
+        else:
+            if assign_var_name is not None:
+                self.__step_context.setup.append("redis:" + str(redis) + "##" + assign_var_name)
+            else:
+                self.__step_context.setup.append("redis:" + str(redis))
         return self
 
-    def setup_mongo(self, mongo: Text) -> "RunRequest":
-        # TODO
-        self.__step_context.setup.append("mongo:" + mongo)
+    def setup_mongo(self, mongo: Union[Text, List], assign_var_name: Text = None) -> "RunRequest":
+        if isinstance(mongo, List):
+            # 指定环境场景
+            db, cli = mongo[0], mongo[1]
+            if assign_var_name is not None:
+                self.__step_context.setup.append("mongo:" + str(cli) + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.setup.append("mongo:" + str(cli) + "&&db:" + str(db))
+        else:
+            if assign_var_name is not None:
+                self.__step_context.setup.append("mongo:" + str(mongo) + "##" + assign_var_name)
+            else:
+                self.__step_context.setup.append("mongo:" + str(mongo))
         return self
 
     def setup_cmd(self, command: Text) -> "RunRequest":

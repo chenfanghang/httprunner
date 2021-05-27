@@ -49,6 +49,9 @@ class RedisHandler:
     def hash_set(self, name, k, v):  # 哈希类型的是多层
         self.r.hset(name, k, v)  # set也不会报错
 
+    def hash_hkeys(self, name):  # 哈希类型，获取所有的key
+        return self.r.hkeys(name)
+
     def hash_getall(self, name):
         res = self.r.hgetall(name)  # 得到的是字典类型的，里面的k,v都是bytes类型的
         data = {}

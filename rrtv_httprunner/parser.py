@@ -457,12 +457,18 @@ def parse_data(
             return execute_cmd(var_value)
         elif get_statement_type(var_value) == "redis":
             try:
-                return execute_redis(variables_mapping["redis"], var_value)
+                if "&&db:" in var_value:  # 指定环境执行redis
+                    return execute_redis(var_value.split("&&db:")[1], var_value.split("&&db:")[0])
+                else:
+                    return execute_redis(variables_mapping["redis"], var_value)
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("redis datasource not configured")
         elif get_statement_type(var_value) == "mongo":
             try:
-                return execute_mongo(variables_mapping["mongo"], var_value)
+                if "&&db:" in var_value:  # 指定环境执行mongo
+                    return execute_mongo(var_value.split("&&db:")[1], var_value.split("&&db:")[0])
+                else:
+                    return execute_mongo(variables_mapping["mongo"], var_value)
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("mongo datasource not configured")
         else:

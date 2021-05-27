@@ -317,7 +317,9 @@ def execute_redis(rd: Union[str, dict], cli: Text) -> Text:
     if parsed_string.lower().startswith("get("):
         return handler.str_get(content[0])
     elif parsed_string.lower().startswith("hget("):
-        handler.hash_getall(content[0]) if len(content) == 1 else handler.hash_get(content[0], content[1])
+        handler.hash_hkeys(content[0]) if len(content) == 1 else handler.hash_get(content[0], content[1])
+    elif parsed_string.lower().startswith("hkeys("):
+        handler.hash_hkeys(content[0])
     elif parsed_string.lower().startswith("set("):
         return handler.str_set(content[0], content[1])
     elif parsed_string.lower().startswith("hset("):
