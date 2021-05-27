@@ -1,5 +1,5 @@
 import inspect
-from typing import Text, Any, Union, Callable, Dict
+from typing import Text, Any, Union, Callable, Dict, List
 
 from deepdiff import DeepDiff
 
@@ -115,17 +115,33 @@ class StepRequestValidation(object):
         self.__step_context.teardown.append(command)
         return self
 
-    def teardown_sql(self, sql: Text) -> "StepRequestValidation":
+    def teardown_sql(self, var: Union[Text, List], assign_var_name: Text = None) -> "StepRequestValidation":
         """ 在接口执行之后执行SQL
 
         Args:
-            sql: 执行SQL
-
+            var: 执行SQL
+            assign_var_name: 变量名
         Examples:
-            >>> StepRequestValidation.teardown_sql("select * from mysql")
+            >>> RunRequest.teardown_sql("select * from mysql")
+            >>> RunRequest.teardown_sql("select * from rrtv","var_name")
+            >>> RunRequest.teardown_sql(["mysql","select * from rrtv"])
+            >>> RunRequest.teardown_sql(["mysql","select * from rrtv"],"var_name")
 
         """
-        self.__step_context.teardown.append("sql:" + sql)
+        if isinstance(var, List):
+            # 指定环境场景
+            db, sql = var[0], var[1]
+            if assign_var_name is not None:
+                # 存储变量
+                self.__step_context.teardown.append("sql:" + str(sql) + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.teardown.append("sql:" + str(sql) + "&&db:" + str(db))
+        else:
+            if assign_var_name is not None:
+                # 存储变量
+                self.__step_context.teardown.append("sql:" + str(var) + "##" + assign_var_name)
+            else:
+                self.__step_context.teardown.append("sql:" + str(var))
         return self
 
     def teardown_redis(self, redis: Text) -> "StepRequestValidation":
@@ -373,18 +389,24 @@ class StepRequestExtraction(object):
         self.__step_context.extract[var_name] = extra
         return self
 
-    def with_sql(self, sql: Text, var_name: Text) -> "StepRequestExtraction":
+    def with_sql(self, var: Union[Text, List], var_name: Text = None) -> "StepRequestExtraction":
         """ 提取sql数据
 
         Args:
-            sql: 执行SQL
+            var: 执行SQL
             var_name: 存储的变量名 后续通过$引用
 
         Examples:
             >>> StepRequestExtraction.with_sql("select * from mysql","var_name")
+            >>> StepRequestExtraction.with_sql(["mysql","select * from rrtv"],"mysql")
 
         """
-        self.__step_context.extract[var_name] = "sql:" + sql
+        if isinstance(var, List):
+            # 指定环境场景
+            db, sql = var[0], var[1]
+            self.__step_context.teardown.append("sql:" + str(sql) + "&&db:" + str(db) + "##" + var_name)
+        else:
+            self.__step_context.teardown.append("sql:" + str(var) + "##" + var_name)
         return self
 
     def with_redis(self, redis: Text, var_name: Text) -> "StepRequestExtraction":
@@ -540,20 +562,33 @@ class RunRequest(object):
         self.__step_context.setup.append(command)
         return self
 
-    def setup_sql(self, sql: Text, assign_var_name: Text = None) -> "RunRequest":
+    def setup_sql(self, var: Union[Text, List], assign_var_name: Text = None) -> "RunRequest":
         """ 在接口执行之前执行SQL
 
         Args:
-            sql: 执行SQL
+            var: 执行SQL
+            assign_var_name: 变量名
 
         Examples:
             >>> RunRequest.setup_sql("select * from mysql")
-
+            >>> RunRequest.setup_sql("select * from rrtv","var_name")
+            >>> RunRequest.setup_sql(["mysql","select * from rrtv"])
+            >>> RunRequest.setup_sql(["mysql","select * from rrtv"],"var_name")
         """
-        if assign_var_name is not None:
-            self.__step_context.setup.append("sql:" + sql + "##" + assign_var_name)
+        if isinstance(var, List):
+            # 指定环境场景
+            db, sql = var[0], var[1]
+            if assign_var_name is not None:
+                # 存储变量
+                self.__step_context.setup.append("sql:" + str(sql) + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.setup.append("sql:" + str(sql) + "&&db:" + str(db))
         else:
-            self.__step_context.setup.append("sql:" + sql)
+            if assign_var_name is not None:
+                # 存储变量
+                self.__step_context.setup.append("sql:" + str(var) + "##" + assign_var_name)
+            else:
+                self.__step_context.setup.append("sql:" + str(var))
         return self
 
     def setup_redis(self, redis: Text) -> "RunRequest":
