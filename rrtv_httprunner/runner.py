@@ -157,10 +157,12 @@ class HttpRunner(object):
                     logger.info("setup begin execute >>>>>>")
                     for s in step.setup:
                         if "##" in s:
-                            extract_mapping[s.split("##")[1]] = parse_data(s.split("##")[0], variables_mapping,
-                                                                           functions_mapping)
+                            var_name = s.split("##")[1]
+                            hook_content_eval = parse_data(s.split("##")[0], variables_mapping,
+                                                           functions_mapping)
+                            extract_mapping[var_name] = hook_content_eval
                             variables_mapping.update(extract_mapping)
-                            logger.info(f"extract mapping: {extract_mapping}")
+                            logger.debug(f"assign variable: {var_name} = {hook_content_eval}")
                         else:
                             parse_data(
                                 s, variables_mapping, functions_mapping
@@ -179,10 +181,12 @@ class HttpRunner(object):
                     logger.info("teardown begin execute >>>>>>")
                     for s in step.teardown:
                         if "##" in s:
-                            extract_mapping[s.split("##")[1]] = parse_data(s.split("##")[0], variables_mapping,
-                                                                           functions_mapping)
+                            var_name = s.split("##")[1]
+                            hook_content_eval = parse_data(s.split("##")[0], variables_mapping,
+                                                           functions_mapping)
+                            extract_mapping[var_name] = hook_content_eval
                             variables_mapping.update(extract_mapping)
-                            logger.info(f"extract mapping: {extract_mapping}")
+                            logger.debug(f"assign variable: {var_name} = {hook_content_eval}")
                         else:
                             parse_data(
                                 s, variables_mapping, functions_mapping

@@ -290,7 +290,7 @@ def execute_sql(db: Union[str, dict], sql: Text) -> Text:
     match_start_position = sql.index(":", 0)
     parsed_string = sql[match_start_position + 1:]
     handler = MySQLHandler(db)
-    logger.info("execute sql: {" + parsed_string + "}")
+    logger.debug("execute sql: {" + parsed_string + "}")
     if parsed_string.lower().startswith("select"):
         return handler.query(parsed_string, one=True)
     elif parsed_string.lower().startswith("insert"):
@@ -304,7 +304,7 @@ def execute_sql(db: Union[str, dict], sql: Text) -> Text:
 def execute_cmd(cmd: Text) -> NoReturn:
     match_start_position = cmd.index(":", 0)
     parsed_string = cmd[match_start_position + 1:]
-    logger.info("execute cmd: { " + parsed_string + " }")
+    logger.debug("execute cmd: { " + parsed_string + " }")
     os.system(parsed_string)
 
 
@@ -312,7 +312,7 @@ def execute_redis(rd: Union[str, dict], cli: Text) -> Text:
     match_start_position = cli.index(":", 0)
     parsed_string = cli[match_start_position + 1:]
     handler = RedisHandler(rd)
-    logger.info("execute redis: { " + parsed_string + " }")
+    logger.debug("execute redis: { " + parsed_string + " }")
     content = re.findall(r'\'(.*?)\'', str(parsed_string))
     if parsed_string.lower().startswith("get("):
         return handler.str_get(content[0])
@@ -339,7 +339,7 @@ def execute_redis(rd: Union[str, dict], cli: Text) -> Text:
 def execute_mongo(db: Union[str, dict], operation: Text) -> Text:
     match_start_position = operation.index(":", 0)
     parsed_string = operation[match_start_position + 1:]
-    logger.info("execute mongodb: { " + parsed_string + " }")
+    logger.debug("execute mongodb: { " + parsed_string + " }")
     scope = {'handler': MongoHandler(db)}
     cli = "handler." + parsed_string
     return eval(cli, scope)
