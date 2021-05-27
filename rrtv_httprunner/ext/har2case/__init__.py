@@ -9,8 +9,9 @@ Usage:
 
 """
 
-from rrtv_httprunner.ext.har2case.core import HarParser
 from sentry_sdk import capture_message
+
+from rrtv_httprunner.ext.har2case.core import HarParser
 
 
 def init_har2case_parser(subparsers):
@@ -43,7 +44,7 @@ def init_har2case_parser(subparsers):
     parser.add_argument(
         "--exclude",
         help="Specify exclude keyword, url that includes exclude string will be ignored, "
-        "multiple keywords can be joined with '|'",
+             "multiple keywords can be joined with '|'",
     )
 
     return parser

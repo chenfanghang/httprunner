@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from rrtv_httprunner.runner import HttpRunner
 from rrtv_httprunner.models import ProjectMeta, TestCase
+from rrtv_httprunner.runner import HttpRunner
 
 router = APIRouter()
 runner = HttpRunner()
@@ -29,7 +29,6 @@ async def debug_single_testcase(project_meta: ProjectMeta, testcase: TestCase):
 
     resp["result"] = summary.dict()
     return resp
-
 
 # @router.post("/hrun/debug/api", tags=["debug"])
 # async def debug_single_api():

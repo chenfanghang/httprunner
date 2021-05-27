@@ -46,9 +46,10 @@ import os
 import sys
 from typing import Text, NoReturn
 
+from loguru import logger
+
 from rrtv_httprunner.models import TStep, FunctionsMapping
 from rrtv_httprunner.parser import parse_variables_mapping
-from loguru import logger
 
 try:
     import filetype

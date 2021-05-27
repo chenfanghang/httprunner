@@ -5,11 +5,12 @@ import re
 from typing import Any, Set, Text, Callable, List, Dict
 
 from loguru import logger
+from sentry_sdk import capture_exception
+
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
 from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis, execute_mongo, \
     remove_bracket_first
-from sentry_sdk import capture_exception
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -437,7 +438,7 @@ def parse_data(
 
         if get_statement_type(var_value) == "sql":
             try:
-                if "&&db:" in var_value:
+                if "&&db:" in var_value:  # 指定环境执行sql
                     value = execute_sql(var_value.split("&&db:")[1], var_value.split("&&db:")[0])
                 else:
                     value = execute_sql(variables_mapping["mysql"], var_value)

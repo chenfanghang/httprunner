@@ -23,7 +23,6 @@ from typing import List
 
 from loguru import logger
 
-
 """ converted pytest files from YAML/JSON testcases
 """
 pytest_files: List = []

@@ -1,6 +1,8 @@
 import inspect
 from typing import Text, Any, Union, Callable, Dict
 
+from deepdiff import DeepDiff
+
 from rrtv_httprunner.models import (
     TConfig,
     TStep,
@@ -326,6 +328,19 @@ class StepRequestValidation(object):
 
         self.__step_context.validators.append(
             {"equal": [condition, jmes_path, if_expected_value, else_expected_value, message]}
+        )
+        return self
+
+    def assert_diff(self, check_value: Union[Dict, Text], expected_value: Union[Dict, Text], message: Text = "",
+                    **kwargs) -> "StepRequestValidation":
+        """
+        Verifies two objects are consistent
+
+        Usage:
+            >>> DeepDiff(check_value, expected_value, **kwargs)
+        """
+        self.__step_context.validators.append(
+            {"t1": check_value, "t2": expected_value, "kwargs": kwargs, "message": message}
         )
         return self
 

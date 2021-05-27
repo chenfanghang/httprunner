@@ -3,7 +3,10 @@ Built-in validate comparators.
 """
 
 import re
-from typing import Text, Any, Union
+from typing import Text, Any, Union, Dict
+
+from deepdiff import DeepDiff
+from loguru import logger
 
 
 def equal(check_value: Any, expect_value: Any, message: Text = ""):
@@ -11,25 +14,25 @@ def equal(check_value: Any, expect_value: Any, message: Text = ""):
 
 
 def greater_than(
-    check_value: Union[int, float], expect_value: Union[int, float], message: Text = ""
+        check_value: Union[int, float], expect_value: Union[int, float], message: Text = ""
 ):
     assert check_value > expect_value, message
 
 
 def less_than(
-    check_value: Union[int, float], expect_value: Union[int, float], message: Text = ""
+        check_value: Union[int, float], expect_value: Union[int, float], message: Text = ""
 ):
     assert check_value < expect_value, message
 
 
 def greater_or_equals(
-    check_value: Union[int, float], expect_value: Union[int, float], message: Text = ""
+        check_value: Union[int, float], expect_value: Union[int, float], message: Text = ""
 ):
     assert check_value >= expect_value, message
 
 
 def less_or_equals(
-    check_value: Union[int, float], expect_value: Union[int, float], message: Text = ""
+        check_value: Union[int, float], expect_value: Union[int, float], message: Text = ""
 ):
     assert check_value <= expect_value, message
 
@@ -48,7 +51,7 @@ def length_equal(check_value: Text, expect_value: int, message: Text = ""):
 
 
 def length_greater_than(
-    check_value: Text, expect_value: Union[int, float], message: Text = ""
+        check_value: Text, expect_value: Union[int, float], message: Text = ""
 ):
     assert isinstance(
         expect_value, (int, float)
@@ -57,7 +60,7 @@ def length_greater_than(
 
 
 def length_greater_or_equals(
-    check_value: Text, expect_value: Union[int, float], message: Text = ""
+        check_value: Text, expect_value: Union[int, float], message: Text = ""
 ):
     assert isinstance(
         expect_value, (int, float)
@@ -66,7 +69,7 @@ def length_greater_or_equals(
 
 
 def length_less_than(
-    check_value: Text, expect_value: Union[int, float], message: Text = ""
+        check_value: Text, expect_value: Union[int, float], message: Text = ""
 ):
     assert isinstance(
         expect_value, (int, float)
@@ -75,7 +78,7 @@ def length_less_than(
 
 
 def length_less_or_equals(
-    check_value: Text, expect_value: Union[int, float], message: Text = ""
+        check_value: Text, expect_value: Union[int, float], message: Text = ""
 ):
     assert isinstance(
         expect_value, (int, float)
@@ -127,3 +130,12 @@ def startswith(check_value: Any, expect_value: Any, message: Text = ""):
 
 def endswith(check_value: Text, expect_value: Any, message: Text = ""):
     assert str(check_value).endswith(str(expect_value)), message
+
+
+def diff(t1: Dict, t2: Dict, kwargs=None):
+    if kwargs is None:
+        kwargs = {}
+    info = DeepDiff(t1, t2, **kwargs)
+    if info != {}:
+        logger.error(info)
+    assert info == {}

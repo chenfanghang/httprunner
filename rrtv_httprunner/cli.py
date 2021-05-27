@@ -97,7 +97,7 @@ def main():
             sub_parser_make.print_help()
         sys.exit(0)
     elif (
-        len(sys.argv) == 3 and sys.argv[1] == "run" and sys.argv[2] in ["-h", "--help"]
+            len(sys.argv) == 3 and sys.argv[1] == "run" and sys.argv[2] in ["-h", "--help"]
     ):
         # httprunner run -h
         pytest.main(["-h"])

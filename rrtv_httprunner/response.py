@@ -4,6 +4,7 @@ import jmespath
 import requests
 from jmespath.exceptions import JMESPathError
 from loguru import logger
+
 from rrtv_httprunner import exceptions
 from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
 from rrtv_httprunner.models import VariablesMapping, Validators, FunctionsMapping
@@ -89,7 +90,19 @@ def uniform_validator(validator, variables_mapping: VariablesMapping = None,
         expect_value = validator["expect"]
         message = validator.get("message", "")
         comparator = validator.get("comparator", "eq")
-
+    elif "t1" in validator and "t2" in validator:
+        check_item = validator["t1"]
+        expect_value = validator["t2"]
+        message = validator.get("message", "")
+        comparator = "diff"
+        kwargs = validator.get("kwargs", "")
+        return {
+            "check": check_item,
+            "expect": expect_value,
+            "assert": comparator,
+            "kwargs": kwargs,
+            "message": message,
+        }
     elif len(validator) == 1:
         # format2
         comparator = list(validator.keys())[0]
@@ -274,7 +287,10 @@ class ResponseObject(object):
                 }
 
                 try:
-                    assert_func(check_value, expect_value, message)
+                    if assert_method == "diff":
+                        assert_func(check_value, expect_value, u_validator["kwargs"])
+                    else:
+                        assert_func(check_value, expect_value, )
                     validate_msg += "\t==> pass"
                     logger.info(validate_msg)
                     validator_dict["check_result"] = "pass"

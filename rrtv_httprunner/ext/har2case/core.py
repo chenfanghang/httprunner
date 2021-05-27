@@ -5,10 +5,10 @@ import sys
 import urllib.parse as urlparse
 from typing import Text
 
-from rrtv_httprunner.compat import ensure_path_sep
 from loguru import logger
 from sentry_sdk import capture_exception
 
+from rrtv_httprunner.compat import ensure_path_sep
 from rrtv_httprunner.ext.har2case import utils
 from rrtv_httprunner.make import make_testcase, format_pytest_with_black
 
@@ -19,7 +19,6 @@ except ImportError:
 
 
 def ensure_file_path(path: Text) -> Text:
-
     if not path or not path.endswith(".har"):
         logger.error("HAR file not specified.")
         sys.exit(1)

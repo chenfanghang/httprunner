@@ -14,9 +14,8 @@ from rrtv_httprunner.utils import sort_dict_by_custom_order
 
 
 def convert_variables(
-    raw_variables: Union[Dict, List, Text], test_path: Text
+        raw_variables: Union[Dict, List, Text], test_path: Text
 ) -> Dict[Text, Any]:
-
     if isinstance(raw_variables, Dict):
         return raw_variables
 
@@ -277,7 +276,6 @@ def ensure_cli_args(args: List) -> List:
 
 
 def _generate_conftest_for_summary(args: List):
-
     for arg in args:
         if os.path.exists(arg):
             test_path = arg
