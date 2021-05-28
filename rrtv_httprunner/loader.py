@@ -319,7 +319,30 @@ def locate_debugtalk_py(start_path: Text) -> Text:
     return debugtalk_path
 
 
-def locate_project_root_directory(test_path: Text) -> Tuple[Text, Text]:
+def locate_custom_py(start_path: Text, project_root_directory: Text) -> Text:
+    """ locate custom.py file
+
+    Args:
+        start_path (str): start locating path,
+            maybe testcase file path or directory path
+
+    Returns:
+        str: custom.py file path, None if not found
+
+    """
+    try:
+        # locate custom.py file.
+        start_dir_path = os.path.dirname(start_path)
+        custom_dir_name = start_dir_path.split("/")[-1]
+        custom_dir_path = os.path.join(project_root_directory, "service")
+        custom_path = os.path.join(custom_dir_path, custom_dir_name + ".py")
+    except exceptions.FileNotFound:
+        custom_path = None
+
+    return custom_path
+
+
+def locate_project_root_directory(test_path: Text) -> Tuple[str, str, str]:
     """ locate debugtalk.py path as project root directory
 
     Args:
@@ -352,8 +375,9 @@ def locate_project_root_directory(test_path: Text) -> Tuple[Text, Text]:
     else:
         # debugtalk.py not found, use os.getcwd() as project RootDir.
         project_root_directory = os.getcwd()
-
-    return debugtalk_path, project_root_directory
+    # custom_path = "/Users/chenfanghang/PycharmProjects/rrtv-httprunner/examples/httpbin/service/httpbin.py"
+    custom_path = locate_custom_py(test_path, project_root_directory)
+    return debugtalk_path, custom_path, project_root_directory
 
 
 def load_debugtalk_functions() -> Dict[Text, Callable]:
@@ -373,6 +397,32 @@ def load_debugtalk_functions() -> Dict[Text, Callable]:
         imported_module = importlib.import_module("debugtalk")
     except Exception as ex:
         logger.error(f"error occurred in debugtalk.py: {ex}")
+        sys.exit(1)
+
+    # reload to refresh previously loaded module
+    imported_module = importlib.reload(imported_module)
+    return load_module_functions(imported_module)
+
+
+def load_custom_functions(start_path: Text) -> Dict[Text, Callable]:
+    """ load project custom.py module functions
+        custom.py should be located in project root directory.
+
+    Returns:
+        dict: custom module functions mapping
+            {
+                "func1_name": func1,
+                "func2_name": func2
+            }
+
+    """
+    # load custom.py module
+    try:
+        start_dir_path = os.path.dirname(start_path)
+        custom_dir_name = start_dir_path.split("/")[-1]
+        imported_module = importlib.import_module(f"service.{custom_dir_name}")
+    except Exception as ex:
+        logger.error(f"error occurred in custom.py: {ex}")
         sys.exit(1)
 
     # reload to refresh previously loaded module
@@ -403,7 +453,7 @@ def load_project_meta(test_path: Text, reload: bool = False) -> ProjectMeta:
     if not test_path:
         return project_meta
 
-    debugtalk_path, project_root_directory = locate_project_root_directory(test_path)
+    debugtalk_path, custom_path, project_root_directory = locate_project_root_directory(test_path)
 
     # add project RootDir to sys.path
     sys.path.insert(0, project_root_directory)
@@ -424,11 +474,18 @@ def load_project_meta(test_path: Text, reload: bool = False) -> ProjectMeta:
     else:
         debugtalk_functions = {}
 
+    if custom_path:
+        # load custom.py functions
+        custom_functions = load_custom_functions(test_path)
+    else:
+        custom_functions = {}
+
     # locate project RootDir and load debugtalk.py functions
     project_meta.RootDir = project_root_directory
     project_meta.functions = debugtalk_functions
+    project_meta.functions.update(custom_functions)
     project_meta.debugtalk_path = debugtalk_path
-
+    project_meta.custom_path = debugtalk_path
     return project_meta
 
 

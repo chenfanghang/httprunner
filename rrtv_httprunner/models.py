@@ -91,6 +91,7 @@ class TestCase(BaseModel):
 class ProjectMeta(BaseModel):
     debugtalk_py: Text = ""  # debugtalk.py file content
     debugtalk_path: Text = ""  # debugtalk.py file path
+    custom_path: Text = ""  # custom.py file path
     dot_env_path: Text = ""  # .env file path
     functions: FunctionsMapping = {}  # functions defined in debugtalk.py
     env: Env = {}

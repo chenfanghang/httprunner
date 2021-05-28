@@ -212,8 +212,6 @@ def parse_function_params(params: Text, func_name: Text) -> Dict:
             key, value = arg.split("=", 1)
             function_meta["kwargs"][key.strip()] = parse_string_value(value.strip())
         else:
-            # if arg.startswith("sql:"):
-            #     arg = arg.split("sql:")[1]
             function_meta["args"].append(parse_string_value(arg))
 
     return function_meta
