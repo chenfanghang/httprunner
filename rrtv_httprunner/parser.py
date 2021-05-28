@@ -588,6 +588,7 @@ def parse_parameters(parameters: Dict, ) -> List[Dict]:
     parsed_parameters_list: List[List[Dict]] = []
 
     # load project_meta functions
+    # globalvar._init()
     project_meta = loader.load_project_meta(os.getcwd())
     functions_mapping = project_meta.functions
 

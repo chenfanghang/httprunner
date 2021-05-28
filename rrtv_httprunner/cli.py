@@ -7,7 +7,7 @@ import pytest
 from loguru import logger
 from sentry_sdk import capture_message
 
-from rrtv_httprunner import __description__, __version__
+from rrtv_httprunner import __description__, __version__, globalvar
 from rrtv_httprunner.compat import ensure_cli_args
 from rrtv_httprunner.ext.har2case import init_har2case_parser, main_har2case
 from rrtv_httprunner.make import init_make_parser, main_make
@@ -43,6 +43,9 @@ def main_run(extra_args) -> enum.IntEnum:
         # has not specified any testcase path
         logger.error(f"No valid testcase path in cli arguments: {extra_args}")
         sys.exit(1)
+    else:
+        globalvar.set_value('run_mode', 'cli')
+        globalvar.set_value('tests_path_list', tests_path_list)
 
     testcase_path_list = main_make(tests_path_list)
     if not testcase_path_list:

@@ -418,16 +418,20 @@ def load_custom_functions(start_path: Text) -> Dict[Text, Callable]:
     """
     # load custom.py module
     try:
-        start_dir_path = os.path.dirname(start_path)
-        custom_dir_name = start_dir_path.split("/")[-1]
-        imported_module = importlib.import_module(f"service.{custom_dir_name}")
+        batch_custom_functions = {}
+        file_path = os.path.join(start_path, "service")
+        list = os.listdir(file_path)
+        for i in range(0, len(list)):
+            path = os.path.join(file_path, list[i])
+            if os.path.isfile(path):
+                custom_dir_name = list[i].split(".py")[0]
+                # reload to refresh previously loaded module
+                imported_module = importlib.import_module(f"service.{custom_dir_name}")
+                batch_custom_functions.update(load_module_functions(imported_module))
     except Exception as ex:
         logger.error(f"error occurred in custom.py: {ex}")
         sys.exit(1)
-
-    # reload to refresh previously loaded module
-    imported_module = importlib.reload(imported_module)
-    return load_module_functions(imported_module)
+    return batch_custom_functions
 
 
 def load_project_meta(test_path: Text, reload: bool = False) -> ProjectMeta:
@@ -476,7 +480,7 @@ def load_project_meta(test_path: Text, reload: bool = False) -> ProjectMeta:
 
     if custom_path:
         # load custom.py functions
-        custom_functions = load_custom_functions(test_path)
+        custom_functions = load_custom_functions(project_root_directory)
     else:
         custom_functions = {}
 
