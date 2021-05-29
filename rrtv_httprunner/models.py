@@ -210,3 +210,9 @@ class TestSuiteSummary(BaseModel):
     time: TestCaseTime = TestCaseTime()
     platform: PlatformInfo
     testcases: List[TestCaseSummary]
+
+
+class DataCorrelation(BaseModel):
+    var_symbol: Text = "##"
+    db_config_symbol: Text = "&&db"
+    support_types: List = ["mysql", "redis", "mongo"]

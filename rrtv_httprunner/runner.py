@@ -32,7 +32,7 @@ from rrtv_httprunner.models import (
     TestCaseInOut,
     ProjectMeta,
     TestCase,
-    Hooks,
+    Hooks, DataCorrelation,
 )
 
 
@@ -136,61 +136,39 @@ class HttpRunner(object):
 
     def __execute(self, aspect: Text, step: TStep, variables_mapping=None,
                   functions_mapping=None, ) -> NoReturn:
-        need_configured_attr = ["mysql", "redis", "mongo"]
-        not_need_configured_attr = ["cmd"]
-        has_attr = False
-        for attr in need_configured_attr:  # 判断是否有数据源
-            if attr in step.variables:
-                has_attr = True
-                break
+
+        def execute(opportunity):
+            for s in opportunity:
+                if constant.var_symbol in s:
+                    var_name = s.split(constant.var_symbol)[1]
+                    hook_content_eval = parse_data(s.split(constant.var_symbol)[0], variables_mapping,
+                                                   functions_mapping)
+                    extract_mapping[var_name] = hook_content_eval
+                    variables_mapping.update(extract_mapping)
+                    logger.debug(f"assign variable: {var_name} = {hook_content_eval}")
+                else:
+                    parse_data(
+                        s, variables_mapping, functions_mapping
+                    )
+
+        constant = DataCorrelation()
+        need_configured_attr = constant.support_types
         extract_mapping = {}
+        has_attr = any(attr in step.variables for attr in need_configured_attr)  # 判断是否有数据源
+
         if aspect == "setup":
             if not has_attr:
-                for attr in not_need_configured_attr:  # 判断是否有数据源
-                    for setup in step.setup:
-                        if "&&db:" in setup:
-                            has_attr = True
-                            break
-
-            if has_attr is True:
-                if step.setup:
-                    logger.info("setup begin execute >>>>>>")
-                    for s in step.setup:
-                        if "##" in s:
-                            var_name = s.split("##")[1]
-                            hook_content_eval = parse_data(s.split("##")[0], variables_mapping,
-                                                           functions_mapping)
-                            extract_mapping[var_name] = hook_content_eval
-                            variables_mapping.update(extract_mapping)
-                            logger.debug(f"assign variable: {var_name} = {hook_content_eval}")
-                        else:
-                            parse_data(
-                                s, variables_mapping, functions_mapping
-                            )
+                has_attr = any(constant.db_config_symbol in setup for setup in step.setup)
+            if has_attr is True and step.setup:
+                logger.info("setup begin execute >>>>>>")
+                execute(step.setup)
 
         elif aspect == "teardown":
             if not has_attr:
-                for attr in not_need_configured_attr:  # 判断是否有数据源
-                    for teardown in step.teardown:
-                        if "&&db:" in teardown:
-                            has_attr = True
-                            break
-
-            if has_attr is True:
-                if step.teardown:
-                    logger.info("teardown begin execute >>>>>>")
-                    for s in step.teardown:
-                        if "##" in s:
-                            var_name = s.split("##")[1]
-                            hook_content_eval = parse_data(s.split("##")[0], variables_mapping,
-                                                           functions_mapping)
-                            extract_mapping[var_name] = hook_content_eval
-                            variables_mapping.update(extract_mapping)
-                            logger.debug(f"assign variable: {var_name} = {hook_content_eval}")
-                        else:
-                            parse_data(
-                                s, variables_mapping, functions_mapping
-                            )
+                has_attr = any(constant.db_config_symbol in teardown for teardown in step.teardown)
+            if has_attr is True and step.teardown:
+                logger.info("teardown begin execute >>>>>>")
+                execute(step.teardown)
 
     def __run_step_request(self, step: TStep) -> StepData:
         """run teststep: request"""
