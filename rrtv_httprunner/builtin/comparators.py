@@ -136,12 +136,9 @@ def diff(t1: Dict, t2: Dict, kwargs=None):
     if kwargs is None:
         kwargs = {}
     validate_value = kwargs.get("validate_value", False)
-
     kwargs.pop("validate_value", None)
     info = dict(DeepDiff(t1, t2, **kwargs))
-    if not validate_value:
-        # 不校验value
-        info.pop("values_changed", None)
-    if info != {}:
-        logger.error(info)
+    # 不校验value
+    info.pop("values_changed", None) if not validate_value else None
+    logger.error(info) if info != {} else None
     assert info == {}
