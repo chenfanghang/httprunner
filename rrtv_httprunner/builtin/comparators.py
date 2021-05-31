@@ -135,7 +135,9 @@ def endswith(check_value: Text, expect_value: Any, message: Text = ""):
 def diff(t1: Dict, t2: Dict, kwargs=None):
     if kwargs is None:
         kwargs = {}
-    info = DeepDiff(t1, t2, **kwargs)
+    info = dict(DeepDiff(t1, t2, **kwargs))
+    if "values_changed" in info:
+        info.pop("values_changed")
     if info != {}:
         logger.error(info)
     assert info == {}
