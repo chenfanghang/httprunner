@@ -277,7 +277,7 @@ def split_with(str_params) -> Dict:
 def get_statement_type(statement: Text) -> Text:
     if isinstance(statement, str):
         if statement.lower().startswith("sql:"):
-            return "sql"
+            return "mysql"
         elif statement.lower().startswith("redis:"):
             return "redis"
         elif statement.lower().startswith("mongo:"):
