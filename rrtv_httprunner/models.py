@@ -212,7 +212,15 @@ class TestSuiteSummary(BaseModel):
     testcases: List[TestCaseSummary]
 
 
-class DataCorrelation(BaseModel):
-    var_symbol: Text = "##"
-    db_config_symbol: Text = "&&db"
-    support_types: List = ["mysql", "redis", "mongo"]
+class DataCorrelationEnum(BaseModel):
+    MYSQL: Text = "mysql"
+    REDIS: Text = "redis"
+    MONGO: Text = "mongo"
+    CMD: Text = "cmd"
+    VAR_SYMBOL: Text = "##"
+    DB_CONFIG_SYMBOL: Text = "&&db:"
+    SUPPORT_TYPES: List = [MYSQL, REDIS, MONGO]
+
+
+# 单例
+data_enum = DataCorrelationEnum()

@@ -32,7 +32,7 @@ from rrtv_httprunner.models import (
     TestCaseInOut,
     ProjectMeta,
     TestCase,
-    Hooks, DataCorrelation,
+    Hooks, DataCorrelationEnum, data_enum,
 )
 
 
@@ -139,9 +139,9 @@ class HttpRunner(object):
 
         def execute(opportunity):
             for s in opportunity:
-                if constant.var_symbol in s:
-                    var_name = s.split(constant.var_symbol)[1]
-                    hook_content_eval = parse_data(s.split(constant.var_symbol)[0], variables_mapping,
+                if data_enum.VAR_SYMBOL in s:
+                    var_name = s.split(data_enum.VAR_SYMBOL)[1]
+                    hook_content_eval = parse_data(s.split(data_enum.VAR_SYMBOL)[0], variables_mapping,
                                                    functions_mapping)
                     extract_mapping[var_name] = hook_content_eval
                     variables_mapping.update(extract_mapping)
@@ -151,21 +151,20 @@ class HttpRunner(object):
                         s, variables_mapping, functions_mapping
                     )
 
-        constant = DataCorrelation()
-        need_configured_attr = constant.support_types
+        need_configured_attr = data_enum.SUPPORT_TYPES
         extract_mapping = {}
         has_attr = any(attr in step.variables for attr in need_configured_attr)  # 判断是否有数据源
 
         if aspect == "setup":
             if not has_attr:
-                has_attr = any(constant.db_config_symbol in setup for setup in step.setup)
+                has_attr = any(data_enum.DB_CONFIG_SYMBOL in setup for setup in step.setup)
             if has_attr is True and step.setup:
                 logger.info("setup begin execute >>>>>>")
                 execute(step.setup)
 
         elif aspect == "teardown":
             if not has_attr:
-                has_attr = any(constant.db_config_symbol in teardown for teardown in step.teardown)
+                has_attr = any(data_enum.DB_CONFIG_SYMBOL in teardown for teardown in step.teardown)
             if has_attr is True and step.teardown:
                 logger.info("teardown begin execute >>>>>>")
                 execute(step.teardown)

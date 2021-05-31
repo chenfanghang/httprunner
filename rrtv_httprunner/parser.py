@@ -8,7 +8,7 @@ from loguru import logger
 from sentry_sdk import capture_exception
 
 from rrtv_httprunner import loader, utils, exceptions
-from rrtv_httprunner.models import VariablesMapping, FunctionsMapping
+from rrtv_httprunner.models import VariablesMapping, FunctionsMapping, data_enum
 from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis, execute_mongo, \
     remove_bracket_first
 
@@ -434,12 +434,12 @@ def parse_data(
         raw_data = raw_data.strip(" \t")
         var_value = parse_string(raw_data, variables_mapping, functions_mapping)
 
-        if get_statement_type(var_value) == "sql":
+        if get_statement_type(var_value) == data_enum.MYSQL:
             try:
-                if "&&db:" in var_value:  # 指定环境执行sql
-                    value = execute_sql(var_value.split("&&db:")[1], var_value.split("&&db:")[0])
+                if data_enum.DB_CONFIG_SYMBOL in var_value:  # 指定环境执行sql
+                    value = execute_sql(var_value.split(data_enum.DB_CONFIG_SYMBOL)[1], var_value.split(data_enum.DB_CONFIG_SYMBOL)[0])
                 else:
-                    value = execute_sql(variables_mapping["mysql"], var_value)
+                    value = execute_sql(variables_mapping[data_enum.MYSQL], var_value)
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("mysql datasource not configured")
             if value is None:  # 如果为None说明非select方法
@@ -451,22 +451,22 @@ def parse_data(
                     return value[suffix2[0]]
                 except KeyError:
                     raise exceptions.SuffixError("suffix name error")
-        elif get_statement_type(var_value) == "cmd":
+        elif get_statement_type(var_value) == data_enum.CMD:
             return execute_cmd(var_value)
-        elif get_statement_type(var_value) == "redis":
+        elif get_statement_type(var_value) == data_enum.REDIS:
             try:
-                if "&&db:" in var_value:  # 指定环境执行redis
-                    return execute_redis(var_value.split("&&db:")[1], var_value.split("&&db:")[0])
+                if data_enum.DB_CONFIG_SYMBOL in var_value:  # 指定环境执行redis
+                    return execute_redis(var_value.split(data_enum.DB_CONFIG_SYMBOL)[1], var_value.split(data_enum.DB_CONFIG_SYMBOL)[0])
                 else:
-                    return execute_redis(variables_mapping["redis"], var_value)
+                    return execute_redis(variables_mapping[data_enum.REDIS], var_value)
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("redis datasource not configured")
-        elif get_statement_type(var_value) == "mongo":
+        elif get_statement_type(var_value) == data_enum.MONGO:
             try:
-                if "&&db:" in var_value:  # 指定环境执行mongo
-                    return execute_mongo(var_value.split("&&db:")[1], var_value.split("&&db:")[0])
+                if data_enum.DB_CONFIG_SYMBOL in var_value:  # 指定环境执行mongo
+                    return execute_mongo(var_value.split(data_enum.DB_CONFIG_SYMBOL)[1], var_value.split(data_enum.DB_CONFIG_SYMBOL)[0])
                 else:
-                    return execute_mongo(variables_mapping["mongo"], var_value)
+                    return execute_mongo(variables_mapping[data_enum.MONGO], var_value)
             except KeyError:  # 没配置数据源
                 raise exceptions.DBError("mongo datasource not configured")
         else:
