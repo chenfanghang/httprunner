@@ -376,6 +376,12 @@ class StepRequestValidation(object):
         """
         Verifies two objects are consistent
 
+        Args:
+            check_value: 检查值
+            expected_value: 预期值
+            message: 报错提示
+            validate_value: 是否校验值 Boolean类型
+
         Usage:
             >>> DeepDiff(check_value, expected_value, **kwargs)
         """
