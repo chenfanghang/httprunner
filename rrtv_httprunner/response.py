@@ -7,8 +7,9 @@ from loguru import logger
 
 from rrtv_httprunner import exceptions
 from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
-from rrtv_httprunner.models import VariablesMapping, Validators, FunctionsMapping
+from rrtv_httprunner.models import VariablesMapping, Validators, FunctionsMapping, data_enum
 from rrtv_httprunner.parser import parse_data, parse_string_value, get_mapping_function
+from rrtv_httprunner.utils import get_statement_type
 
 
 def get_uniform_comparator(comparator: Text):

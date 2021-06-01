@@ -398,6 +398,14 @@ class StepRequestExtraction(object):
     def __init__(self, step_context: TStep):
         self.__step_context = step_context
 
+    def __extract__(self, db_type: Text, var: Union[Text, List], var_name: Text = None):
+        if isinstance(var, List):
+            # 指定环境场景
+            db, command = var[0], var[1]
+            self.__step_context.extract[var_name] = db_type + ":" + str(command) + "&&db:" + str(db)
+        else:
+            self.__step_context.extract[var_name] = db_type + ":" + str(var)
+
     def with_jmespath(self, jmes_path: Text, var_name: Text) -> "StepRequestExtraction":
         self.__step_context.extract[var_name] = jmes_path
         return self
@@ -431,19 +439,14 @@ class StepRequestExtraction(object):
             >>> StepRequestExtraction.with_sql(["mysql","select * from rrtv"],"mysql")
 
         """
-        if isinstance(var, List):
-            # 指定环境场景
-            db, sql = var[0], var[1]
-            self.__step_context.teardown.append("sql:" + str(sql) + "&&db:" + str(db) + "##" + var_name)
-        else:
-            self.__step_context.teardown.append("sql:" + str(var) + "##" + var_name)
+        self.__extract__("sql", var, var_name)
         return self
 
-    def with_redis(self, redis: Union[Text, List], var_name: Text = None) -> "StepRequestExtraction":
+    def with_redis(self, var: Union[Text, List], var_name: Text = None) -> "StepRequestExtraction":
         """
 
         Args:
-            redis: redis命令
+            var: redis命令
             var_name: 存储的变量名 后续通过$引用
 
         Examples:
@@ -459,21 +462,20 @@ class StepRequestExtraction(object):
             >>> StepRequestExtraction.with_redis("str_get('key')","var_name") # 直接调用api
 
         """
-        if isinstance(redis, List):
-            # 指定环境场景
-            db, cli = redis[0], redis[1]
-            self.__step_context.extract[var_name] = "redis:" + str(cli) + "&&db:" + str(db) + "##" + var_name
-        else:
-            self.__step_context.extract[var_name] = "redis:" + str(redis) + "##" + var_name
+        self.__extract__("redis", var, var_name)
         return self
 
-    def with_mongo(self, mongo: Text, var_name: Text) -> "StepRequestExtraction":
-        if isinstance(mongo, List):
-            # 指定环境场景
-            db, cli = mongo[0], mongo[1]
-            self.__step_context.extract[var_name] = "mongo:" + str(cli) + "&&db:" + str(db) + "##" + var_name
-        else:
-            self.__step_context.extract[var_name] = "mongo:" + str(mongo) + "##" + var_name
+    def with_mongo(self, var: Text, var_name: Text) -> "StepRequestExtraction":
+        """ 提取mongo数据
+
+        Args:
+            var: mongo指令
+            var_name: 存储的变量名 后续通过$引用
+
+        Returns:self
+
+        """
+        self.__extract__("mongo", var, var_name)
         return self
 
     # def with_regex(self):
