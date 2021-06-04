@@ -404,30 +404,39 @@ def load_debugtalk_functions() -> Dict[Text, Callable]:
     return load_module_functions(imported_module)
 
 
-def load_custom_functions(start_path: Text) -> Dict[Text, Callable]:
-    """ load project custom.py module functions
-        custom.py should be located in project root directory.
-
-    Returns:
-        dict: custom module functions mapping
-            {
-                "func1_name": func1,
-                "func2_name": func2
-            }
-
+def load_custom_functions_by_path(custom_path: Text = None) -> Dict[Text, Callable]:
+    """ load project custom module functions
     """
-    # load custom.py module
+    try:
+        batch_custom_functions = {}
+        if custom_path is not None:
+            custom_path_list = custom_path.split(",")
+            for path in custom_path_list:
+                if path != "":
+                    path = path.replace("/", ".").split(".py")[0]
+                    mported_module = importlib.import_module(path)
+                    batch_custom_functions.update(load_module_functions(mported_module))
+    except Exception as ex:
+        logger.error(f"error occurred in custom.py: {ex}")
+        sys.exit(1)
+    return batch_custom_functions
+
+
+def load_custom_functions_default(start_path: Text = None) -> Dict[Text, Callable]:
+    """ load project custom module functions
+    """
     try:
         batch_custom_functions = {}
         file_path = os.path.join(start_path, "service")
-        list = os.listdir(file_path)
-        for i in range(0, len(list)):
-            path = os.path.join(file_path, list[i])
+        file_path_list = os.listdir(file_path)
+        for i in range(0, len(file_path_list)):
+            path = os.path.join(file_path, file_path_list[i])
             if os.path.isfile(path):
-                custom_dir_name = list[i].split(".py")[0]
+                custom_py_name = file_path_list[i].split(".py")[0]
                 # reload to refresh previously loaded module
-                imported_module = importlib.import_module(f"service.{custom_dir_name}")
+                imported_module = importlib.import_module(f"service.{custom_py_name}")
                 batch_custom_functions.update(load_module_functions(imported_module))
+
     except Exception as ex:
         logger.error(f"error occurred in custom.py: {ex}")
         sys.exit(1)
@@ -468,9 +477,12 @@ def load_project_meta(test_path: Text, reload: bool = False) -> ProjectMeta:
     # thus .env file should be loaded before loading debugtalk.py
     dot_env_path = os.path.join(project_root_directory, ".env")
     dot_env = load_dot_env_file(dot_env_path)
+    custom_functions = {}
     if dot_env:
         project_meta.env = dot_env
         project_meta.dot_env_path = dot_env_path
+        if "load_function" in dot_env:
+            custom_functions = load_custom_functions_by_path(dot_env["load_function"])
 
     if debugtalk_path:
         # load debugtalk.py functions
@@ -480,7 +492,11 @@ def load_project_meta(test_path: Text, reload: bool = False) -> ProjectMeta:
 
     if custom_path:
         # load custom.py functions
-        custom_functions = load_custom_functions(project_root_directory)
+        if custom_functions == {}:
+            custom_functions = load_custom_functions_default(project_root_directory)
+        else:
+            custom_functions.update(load_custom_functions_default(project_root_directory))
+
     else:
         custom_functions = {}
 
