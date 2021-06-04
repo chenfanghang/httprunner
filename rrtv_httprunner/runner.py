@@ -158,6 +158,8 @@ class HttpRunner(object):
         if aspect == "setup":
             if not has_attr:
                 has_attr = any(data_enum.DB_CONFIG_SYMBOL in setup for setup in step.setup)
+            if not has_attr:
+                raise Exception("data source not found, please check configuration")
             if has_attr is True and step.setup:
                 logger.info("setup begin execute >>>>>>")
                 execute(step.setup)
@@ -165,6 +167,8 @@ class HttpRunner(object):
         elif aspect == "teardown":
             if not has_attr:
                 has_attr = any(data_enum.DB_CONFIG_SYMBOL in teardown for teardown in step.teardown)
+            if not has_attr:
+                raise Exception("data source not found, please check configuration")
             if has_attr is True and step.teardown:
                 logger.info("teardown begin execute >>>>>>")
                 execute(step.teardown)
