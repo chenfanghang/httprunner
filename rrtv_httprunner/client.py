@@ -1,5 +1,6 @@
 import json
 import time
+from urllib.parse import quote, unquote
 
 import requests
 import urllib3
@@ -33,8 +34,11 @@ def get_req_resp_record(resp_obj: Response) -> ReqRespData:
     def log_print(req_or_resp, r_type):
         msg = f"\n================== {r_type} details ==================\n"
         for key, value in req_or_resp.dict().items():
+            if isinstance(value, str):
+                value = unquote(value)
             if isinstance(value, dict):
-                value = json.dumps(value, indent=4)
+                value = {k: unquote(v) for k, v in value.items() if isinstance(v, str)}
+                value = json.dumps(value, indent=4, ensure_ascii=False)
 
             msg += "{:<8} : {}\n".format(key, value)
         logger.debug(msg)
@@ -181,7 +185,8 @@ class HttpSession(requests.Session):
         # 实现form-data传参
         if kwargs["files"] is not None:
             kwargs["files"] = {k: tuple(v) for k, v in kwargs["files"].items()}
-
+        if kwargs["headers"] is not None:
+            kwargs["headers"] = {k: quote(v) for k, v in kwargs["headers"].items()}
         start_timestamp = time.time()
         response = self._send_request_safe_mode(method, url, **kwargs)
         response_time_ms = round((time.time() - start_timestamp) * 1000, 2)

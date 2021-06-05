@@ -3,6 +3,7 @@ import time
 import uuid
 from datetime import datetime
 from typing import List, Dict, Text, NoReturn
+from urllib.parse import unquote
 
 try:
     import allure
@@ -32,7 +33,7 @@ from rrtv_httprunner.models import (
     TestCaseInOut,
     ProjectMeta,
     TestCase,
-    Hooks, DataCorrelationEnum, data_enum,
+    Hooks, data_enum,
 )
 
 
@@ -220,12 +221,16 @@ class HttpRunner(object):
 
             # log request
             err_msg += "====== request details ======\n"
-            err_msg += f"url: {url}\n"
+            err_msg += f"url: {unquote(url)}\n"
             err_msg += f"method: {method}\n"
             headers = parsed_request_dict.pop("headers", {})
             err_msg += f"headers: {headers}\n"
             for k, v in parsed_request_dict.items():
                 v = utils.omit_long_data(v)
+                if isinstance(v, str):
+                    v = unquote(v)
+                if isinstance(v, dict):
+                    v = {k: unquote(v) for k, v in v.items() if isinstance(v, str)}
                 err_msg += f"{k}: {repr(v)}\n"
 
             err_msg += "\n"
