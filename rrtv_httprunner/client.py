@@ -1,5 +1,6 @@
 import json
 import time
+from typing import Dict, Text
 from urllib.parse import quote, unquote
 
 import requests
@@ -34,10 +35,16 @@ def get_req_resp_record(resp_obj: Response) -> ReqRespData:
     def log_print(req_or_resp, r_type):
         msg = f"\n================== {r_type} details ==================\n"
         for key, value in req_or_resp.dict().items():
-            if isinstance(value, str):
+            if isinstance(value, Text):
                 value = unquote(value)
-            if isinstance(value, dict):
-                value = {k: unquote(v) for k, v in value.items() if isinstance(v, str)}
+            if isinstance(value, Dict):
+                for k, v in value.items():
+                    # new_value = {}
+                    if isinstance(v, Text):
+                        value[k] = unquote(v)
+                    else:
+                        value[k] = v
+                # value = {k: unquote(v) for k, v in value.items() if isinstance(v, str)}
                 value = json.dumps(value, indent=4, ensure_ascii=False)
 
             msg += "{:<8} : {}\n".format(key, value)

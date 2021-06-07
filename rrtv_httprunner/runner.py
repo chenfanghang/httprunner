@@ -1,7 +1,7 @@
+import datetime
 import os
 import time
 import uuid
-from datetime import datetime
 from typing import List, Dict, Text, NoReturn
 from urllib.parse import unquote
 
@@ -165,6 +165,15 @@ class HttpRunner(object):
                 logger.info("setup begin execute >>>>>>")
                 execute(step.setup)
 
+        if aspect == "middle":
+            if not has_attr:
+                has_attr = any(data_enum.DB_CONFIG_SYMBOL in setup for setup in step.setup)
+            if not has_attr:
+                raise Exception("data source not found, please check configuration")
+            if has_attr is True and step.execute:
+                logger.info("begin execute >>>>>>")
+                execute(step.execute)
+
         elif aspect == "teardown":
             if not has_attr:
                 has_attr = any(data_enum.DB_CONFIG_SYMBOL in teardown for teardown in step.teardown)
@@ -221,7 +230,7 @@ class HttpRunner(object):
 
             # log request
             err_msg += "====== request details ======\n"
-            err_msg += f"url: {unquote(url)}\n"
+            err_msg += f"url: {url}\n"
             err_msg += f"method: {method}\n"
             headers = parsed_request_dict.pop("headers", {})
             err_msg += f"headers: {headers}\n"

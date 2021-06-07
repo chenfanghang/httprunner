@@ -604,6 +604,34 @@ class RunRequest(object):
         self.__step_context.setup.append(command)
         return self
 
+    def execute(self, var: Union[Text, List], assign_var_name: Text = None) -> "RunRequest":
+        """ 在接口执行之前执行命令
+
+        Args:
+            var: 执行的命令
+            assign_var_name: 存储变量
+
+        Examples:
+            >>> RunRequest.execute("sql:xxx")
+            >>> RunRequest.execute("redis:xxx")
+            >>> RunRequest.execute("mongo:xxx")
+            >>> RunRequest.execute("cmd:xxx")
+
+        """
+        if isinstance(var, List):
+            # 指定环境场景
+            db, command = var[0], var[1]
+            if assign_var_name is not None:
+                self.__step_context.execute.append(command + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.execute.append(command + "&&db:" + str(db))
+        else:
+            if assign_var_name is not None:
+                self.__step_context.execute.append(var + "##" + assign_var_name)
+            else:
+                self.__step_context.execute.append(var)
+        return self
+
     def setup_sql(self, var: Union[Text, List], assign_var_name: Text = None) -> "RunRequest":
         """ 在接口执行之前执行SQL
 
@@ -700,6 +728,101 @@ class RunRequest(object):
         else:
             self.__step_context.setup_hooks.append(hook)
 
+        return self
+
+    def execute_sql(self, var: Union[Text, List], assign_var_name: Text = None) -> "RunRequest":
+        """ 在with_variables之后 在接口执行之前执行SQL
+
+        Args:
+            var: 执行SQL
+            assign_var_name: 变量名
+
+        Examples:
+            >>> RunRequest.execute_sql("select * from mysql")
+            >>> RunRequest.execute_sql("select * from rrtv","var_name")
+            >>> RunRequest.execute_sql(["mysql","select * from rrtv"])
+            >>> RunRequest.execute_sql(["mysql","select * from rrtv"],"var_name")
+        """
+        if isinstance(var, List):
+            # 指定环境场景
+            db, sql = var[0], var[1]
+            if assign_var_name is not None:
+                self.__step_context.execute.append("sql:" + str(sql) + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.execute.append("sql:" + str(sql) + "&&db:" + str(db))
+        else:
+            if assign_var_name is not None:
+                self.__step_context.execute.append("sql:" + str(var) + "##" + assign_var_name)
+            else:
+                self.__step_context.execute.append("sql:" + str(var))
+        return self
+
+    def execute_redis(self, redis: Union[Text, List], assign_var_name: Text = None) -> "RunRequest":
+        """ 在with_variables之后 在接口执行之前执行redis
+
+        Args:
+            redis: redis命令
+            assign_var_name: 变量名
+
+        Examples:
+            >>> RunRequest.execute_redis("get('key')","var_name") # 取出键key对应的值
+            >>> RunRequest.execute_redis("hget('name','key')","var_name") # 取出hash的key对应的值
+            >>> RunRequest.execute_redis("hget('name')","var_name") # 取出hash中所有的键值对
+            >>> RunRequest.execute_redis("hkeys('name')","var_name") # 取出hash中所有的键值对
+            >>> RunRequest.execute_redis("set('key','rrtv')") # 设置key对应的值
+            >>> RunRequest.execute_redis("hset('name','key','value')") # name对应的hash中设置一个键值对--没有就新增，有的话就修改
+            >>> RunRequest.execute_redis("del('key')") # 删除指定key的键值对
+            >>> RunRequest.execute_redis("hdel(name, k)") # 删除hash中键值对
+            >>> RunRequest.execute_redis("clean") # 清空redis
+            >>> RunRequest.execute_redis("exists(key)") # 判断key是否存在
+            >>> RunRequest.execute_redis("str_get('key')","var_name") # 直接调用api
+
+        """
+        if isinstance(redis, List):
+            # 指定环境场景
+            db, cli = redis[0], redis[1]
+            if assign_var_name is not None:
+                self.__step_context.execute.append("redis:" + str(cli) + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.execute.append("redis:" + str(cli) + "&&db:" + str(db))
+        else:
+            if assign_var_name is not None:
+                self.__step_context.execute.append("redis:" + str(redis) + "##" + assign_var_name)
+            else:
+                self.__step_context.execute.append("redis:" + str(redis))
+        return self
+
+    def execute_mongo(self, mongo: Union[Text, List], assign_var_name: Text = None) -> "RunRequest":
+        """在with_variables之后 在接口执行之前执行mongo
+        Args:
+            mongo: mongo命令
+            assign_var_name: 变量名
+        """
+        if isinstance(mongo, List):
+            # 指定环境场景
+            db, cli = mongo[0], mongo[1]
+            if assign_var_name is not None:
+                self.__step_context.execute.append("mongo:" + str(cli) + "&&db:" + str(db) + "##" + assign_var_name)
+            else:
+                self.__step_context.execute.append("mongo:" + str(cli) + "&&db:" + str(db))
+        else:
+            if assign_var_name is not None:
+                self.__step_context.execute.append("mongo:" + str(mongo) + "##" + assign_var_name)
+            else:
+                self.__step_context.execute.append("mongo:" + str(mongo))
+        return self
+
+    def execute_cmd(self, command: Text) -> "RunRequest":
+        """ 在with_variables之后 在接口执行之前执行cmd
+
+        Args:
+            command: cmd命令
+
+        Examples:
+            >>> RunRequest.execute_cmd("echo 'Hello World !'")
+
+        """
+        self.__step_context.execute.append("cmd:" + command)
         return self
 
     def get(self, url: Text) -> RequestWithOptionalArgs:

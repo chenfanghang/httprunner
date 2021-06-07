@@ -21,6 +21,7 @@ Validators = List[Dict]
 Env = Dict[Text, Any]
 Extra = List[Text]
 SetUp = List[Text]
+Execute = List[Text]
 TearDown = List[Text]
 
 
@@ -80,6 +81,7 @@ class TStep(BaseModel):
     validators: Validators = Field([], alias="validate")
     validate_script: List[Text] = []
     setup: SetUp = []
+    execute: Execute = []
     teardown: TearDown = []
 
 
