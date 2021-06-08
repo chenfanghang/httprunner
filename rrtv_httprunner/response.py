@@ -188,8 +188,9 @@ class ResponseObject(object):
             key_list = [key for key in resp_obj_meta.keys()]
             flag = False
             for k in key_list:
-                if k in expr:
-                    flag = True
+                if not isinstance(expr, int):
+                    if k in expr:
+                        flag = True
             check_value = jmespath.search(expr, resp_obj_meta) if flag is True else expr
         except JMESPathError as ex:
             check_value = parse_string_value(expr)
