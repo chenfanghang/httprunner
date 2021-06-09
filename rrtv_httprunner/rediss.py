@@ -38,8 +38,10 @@ class RedisHandler:
         # 而不用将整个k值传过来（如果k里面存的东西比较多，那么传输很耗时）
         if tag:
             self.r.delete(k)
+            return 1
         else:
             logger.debug(f"{k}:这个key不存在")
+            return 0
 
     def hash_get(self, name, k):  # 哈希类型存储的是多层字典（嵌套字典）
         res = self.r.hget(name, k)

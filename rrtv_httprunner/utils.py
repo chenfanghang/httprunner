@@ -308,10 +308,14 @@ def execute_cmd(cmd: Text) -> NoReturn:
     os.system(parsed_string)
 
 
-def execute_redis(rd: Union[Text, Dict, List], cli: Text) -> Text:
+def execute_redis(rd: Union[Text, Dict, List], cli: Text) -> Any:
     def is_get():
         get_func = ["get(", "hget(", "hkeys(", "hash_get(", "str_get(", "hash_getall("]
         return any(parsed_string.lower().startswith(func) is True for func in get_func)
+
+    def is_del():
+        del_func = ["del(", "hdel(", "delete(", "hash_del("]
+        return any(parsed_string.lower().startswith(func) is True for func in del_func)
 
     def execute(config, content):
         handler = RedisHandler(config)
@@ -348,6 +352,9 @@ def execute_redis(rd: Union[Text, Dict, List], cli: Text) -> Text:
             if is_get() is True:
                 if value is not None:
                     return value
+            if is_del() is True:
+                if value == 1:  # delete success
+                    return None
             else:
                 return value
     else:
