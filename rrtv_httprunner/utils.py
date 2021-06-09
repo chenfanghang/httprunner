@@ -351,9 +351,11 @@ def execute_redis(rd: Union[Text, Dict, List], cli: Text) -> Any:
             value = execute(v, content)
             if is_get() is True:
                 if value is not None:
+                    logger.debug(f"在 {v} 中查找到key:{content}")
                     return value
             if is_del() is True:
                 if value == 1:  # delete success
+                    logger.debug(f"在 {v} 中删除成功")
                     return None
             else:
                 return value
