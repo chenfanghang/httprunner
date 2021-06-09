@@ -74,7 +74,7 @@ class Config(object):
         self.__datasource["mysql"] = config
         return self
 
-    def redis(self, config: Union[Text, Dict]) -> "Config":
+    def redis(self, config: Union[Text, Dict, List]) -> "Config":
         self.__datasource["redis"] = config
         return self
 

@@ -308,32 +308,50 @@ def execute_cmd(cmd: Text) -> NoReturn:
     os.system(parsed_string)
 
 
-def execute_redis(rd: Union[str, dict], cli: Text) -> Text:
+def execute_redis(rd: Union[Text, Dict, List], cli: Text) -> Text:
+    def is_get():
+        get_func = ["get(", "hget(", "hkeys(", "hash_get(", "str_get(", "hash_getall("]
+        return any(parsed_string.lower().startswith(func) is True for func in get_func)
+
+    def execute(config, content):
+        handler = RedisHandler(config)
+        if parsed_string.lower().startswith("get("):
+            return handler.str_get(content[0])
+        elif parsed_string.lower().startswith("hget("):
+            handler.hash_hkeys(content[0]) if len(content) == 1 else handler.hash_get(content[0], content[1])
+        elif parsed_string.lower().startswith("hkeys("):
+            handler.hash_hkeys(content[0])
+        elif parsed_string.lower().startswith("set("):
+            return handler.str_set(content[0], content[1])
+        elif parsed_string.lower().startswith("hset("):
+            return handler.hash_set(content[0], content[1], content[2])
+        elif parsed_string.lower().startswith("del("):
+            return handler.delete(content[0])
+        elif parsed_string.lower().startswith("hdel("):
+            return handler.str_set(content[0], content[1])
+        elif parsed_string.lower().startswith("clean") and parsed_string != "clean_redis":
+            return handler.clean_redis
+        else:
+            scope = {'handler': RedisHandler(rd)}
+            cli = "handler." + parsed_string
+            return eval(cli, scope)
+
     match_start_position = cli.index(":", 0)
     parsed_string = cli[match_start_position + 1:]
-    handler = RedisHandler(rd)
     logger.debug("execute redis: { " + parsed_string + " }")
     content = re.findall(r'\'(.*?)\'', str(parsed_string))
-    if parsed_string.lower().startswith("get("):
-        return handler.str_get(content[0])
-    elif parsed_string.lower().startswith("hget("):
-        handler.hash_hkeys(content[0]) if len(content) == 1 else handler.hash_get(content[0], content[1])
-    elif parsed_string.lower().startswith("hkeys("):
-        handler.hash_hkeys(content[0])
-    elif parsed_string.lower().startswith("set("):
-        return handler.str_set(content[0], content[1])
-    elif parsed_string.lower().startswith("hset("):
-        return handler.hash_set(content[0], content[1], content[2])
-    elif parsed_string.lower().startswith("del("):
-        return handler.delete(content[0])
-    elif parsed_string.lower().startswith("hdel("):
-        return handler.str_set(content[0], content[1])
-    elif parsed_string.lower().startswith("clean") and parsed_string != "clean_redis":
-        return handler.clean_redis
+
+    data_source = eval(rd) if isinstance(rd, Text) else rd
+    if isinstance(data_source, List):
+        for v in data_source:
+            value = execute(v, content)
+            if is_get() is True:
+                if value is not None:
+                    return value
+            else:
+                return value
     else:
-        scope = {'handler': RedisHandler(rd)}
-        cli = "handler." + parsed_string
-        return eval(cli, scope)
+        return execute(data_source, content)
 
 
 def execute_mongo(db: Union[str, dict], operation: Text) -> Text:

@@ -1,5 +1,5 @@
 # @author: chenfanghang
-from typing import Union
+from typing import Union, Text, Dict
 
 import redis
 from loguru import logger
@@ -8,7 +8,7 @@ from rrtv_httprunner import exceptions
 
 
 class RedisHandler:
-    def __init__(self, driver: Union[str, dict]):
+    def __init__(self, driver: Union[Text, Dict]):
 
         driver = driver if isinstance(driver, dict) else eval(driver)
         try:
