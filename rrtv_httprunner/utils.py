@@ -317,6 +317,10 @@ def execute_redis(rd: Union[Text, Dict, List], cli: Text) -> Any:
         del_func = ["del(", "hdel(", "delete(", "hash_del("]
         return any(parsed_string.lower().startswith(func) is True for func in del_func)
 
+    def is_exists():
+        exists_func = ["exists("]
+        return any(parsed_string.lower().startswith(func) is True for func in exists_func)
+
     def execute(config, content):
         handler = RedisHandler(config)
         if parsed_string.lower().startswith("get("):
@@ -336,7 +340,7 @@ def execute_redis(rd: Union[Text, Dict, List], cli: Text) -> Any:
         elif parsed_string.lower().startswith("clean") and parsed_string != "clean_redis":
             return handler.clean_redis
         else:
-            scope = {'handler': RedisHandler(rd)}
+            scope = {'handler': RedisHandler(config)}
             cli = "handler." + parsed_string
             return eval(cli, scope)
 
@@ -351,14 +355,24 @@ def execute_redis(rd: Union[Text, Dict, List], cli: Text) -> Any:
             value = execute(v, content)
             if is_get() is True:
                 if value is not None:
-                    logger.debug(f"在 {v} 中查找到key:{content}")
                     return value
+                elif data_source.index(v) == len(data_source) - 1 and value is None:
+                    return None
             if is_del() is True:
                 if value == 1:  # delete success
-                    logger.debug(f"在 {v} 中删除成功")
-                    return None
+                    logger.debug(f"在{v}中删除成功")
+                    return 1
+                elif data_source.index(v) == len(data_source) - 1 and value == 0:
+                    return 0
+            if is_exists() is True:
+                if value == 1:
+                    logger.debug(f"在{v}中存在key:{content}")
+                    return value
+                elif data_source.index(v) == len(data_source) - 1 and value == 0:
+                    return 0
             else:
                 return value
+
     else:
         return execute(data_source, content)
 
