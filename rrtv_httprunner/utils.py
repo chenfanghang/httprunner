@@ -8,6 +8,7 @@ import re
 import uuid
 from multiprocessing import Queue
 from typing import Dict, List, Any, Text, NoReturn, Union
+from urllib.parse import quote, unquote
 
 import sentry_sdk
 from loguru import logger
@@ -404,3 +405,26 @@ def remove_bracket_first(word):
     right = word[data2 + 1:]
     word = left + right
     return word
+
+
+def quote_dict(content: Dict):
+    for k, v in content.items():
+        if not isinstance(v, int):
+            content[k] = quote(v)
+        else:
+            content[k] = v
+    return content
+
+
+def unquote_dict(value: Union[Text, Dict]):
+    if isinstance(value, Text):
+        return unquote(value)
+    if isinstance(value, Dict):
+        for k, v in value.items():
+            if isinstance(v, Text):
+                value[k] = unquote(v)
+            else:
+                value[k] = unquote_dict(v)
+        return value
+    else:
+        return value

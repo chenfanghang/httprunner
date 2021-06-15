@@ -1,7 +1,6 @@
 import json
 import time
-from typing import Dict, Text
-from urllib.parse import quote, unquote
+from typing import Dict
 
 import requests
 import urllib3
@@ -16,7 +15,7 @@ from requests.exceptions import (
 
 from rrtv_httprunner.models import RequestData, ResponseData
 from rrtv_httprunner.models import SessionData, ReqRespData
-from rrtv_httprunner.utils import lower_dict_keys, omit_long_data
+from rrtv_httprunner.utils import lower_dict_keys, omit_long_data, quote_dict, unquote_dict
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -35,18 +34,9 @@ def get_req_resp_record(resp_obj: Response) -> ReqRespData:
     def log_print(req_or_resp, r_type):
         msg = f"\n================== {r_type} details ==================\n"
         for key, value in req_or_resp.dict().items():
-            if isinstance(value, Text):
-                value = unquote(value)
+            value = unquote_dict(value)
             if isinstance(value, Dict):
-                for k, v in value.items():
-                    # new_value = {}
-                    if isinstance(v, Text):
-                        value[k] = unquote(v)
-                    else:
-                        value[k] = v
-                # value = {k: unquote(v) for k, v in value.items() if isinstance(v, str)}
                 value = json.dumps(value, indent=4, ensure_ascii=False)
-
             msg += "{:<8} : {}\n".format(key, value)
         logger.debug(msg)
 
@@ -191,9 +181,9 @@ class HttpSession(requests.Session):
                 kwargs["data"] = str(kwargs["data"]).encode("utf-8").decode("latin1")
         # 实现form-data传参
         if kwargs["files"] is not None:
-            kwargs["files"] = {k: tuple(v) for k, v in kwargs["files"].items()}
+            quote_dict(kwargs["files"])
         if kwargs["headers"] is not None:
-            kwargs["headers"] = {k: quote(v) for k, v in kwargs["headers"].items()}
+            quote_dict(kwargs["headers"])
         start_timestamp = time.time()
         response = self._send_request_safe_mode(method, url, **kwargs)
         response_time_ms = round((time.time() - start_timestamp) * 1000, 2)
