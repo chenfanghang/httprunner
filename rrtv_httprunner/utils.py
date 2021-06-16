@@ -409,7 +409,7 @@ def remove_bracket_first(word):
 
 def quote_dict(content: Dict):
     for k, v in content.items():
-        if not isinstance(v, int):
+        if isinstance(v, Text):
             content[k] = quote(v)
         else:
             content[k] = v
