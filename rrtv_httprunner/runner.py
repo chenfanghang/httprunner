@@ -255,14 +255,6 @@ class HttpRunner(object):
         variables_mapping = step.variables
         variables_mapping.update(extract_mapping)
 
-        # teardown hooks
-        if step.teardown_hooks:
-            self.__call_hooks(step.teardown_hooks, step.variables, "teardown request")
-
-        # 执行teardown
-        if step.teardown:
-            self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
-
         # validate
         validators = step.validators
         session_success = False
@@ -290,6 +282,13 @@ class HttpRunner(object):
                 # save step data
                 step_data.data = self.__session.data
 
+        # teardown hooks
+        if step.teardown_hooks:
+            self.__call_hooks(step.teardown_hooks, step.variables, "teardown request")
+
+        # 执行teardown
+        if step.teardown:
+            self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
         return step_data
 
     def __run_step_testcase(self, step: TStep) -> StepData:
