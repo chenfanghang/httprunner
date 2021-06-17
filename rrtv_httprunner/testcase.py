@@ -99,6 +99,16 @@ class StepRequestValidation(object):
     def __init__(self, step_context: TStep):
         self.__step_context = step_context
 
+    def teardown_hook(
+            self, hook: Text, assign_var_name: Text = None
+    ) -> "StepRequestValidation":
+        if assign_var_name:
+            self.__step_context.teardown_hooks.append({assign_var_name: hook})
+        else:
+            self.__step_context.teardown_hooks.append(hook)
+
+        return self
+
     def teardown_exec(self, command) -> "StepRequestValidation":
         """ 在接口执行之后执行命令
 
@@ -558,16 +568,6 @@ class RequestWithOptionalArgs(object):
 
     def upload(self, **file_info) -> "RequestWithOptionalArgs":
         self.__step_context.request.upload.update(file_info)
-        return self
-
-    def teardown_hook(
-            self, hook: Text, assign_var_name: Text = None
-    ) -> "RequestWithOptionalArgs":
-        if assign_var_name:
-            self.__step_context.teardown_hooks.append({assign_var_name: hook})
-        else:
-            self.__step_context.teardown_hooks.append(hook)
-
         return self
 
     def extract(self) -> StepRequestExtraction:

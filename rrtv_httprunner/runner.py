@@ -221,10 +221,6 @@ class HttpRunner(object):
         resp_obj = ResponseObject(resp)
         step.variables["response"] = resp_obj
 
-        # teardown hooks
-        if step.teardown_hooks:
-            self.__call_hooks(step.teardown_hooks, step.variables, "teardown request")
-
         def log_req_resp_details():
             err_msg = "\n{} DETAILED REQUEST & RESPONSE {}\n".format("*" * 32, "*" * 32)
 
@@ -258,6 +254,11 @@ class HttpRunner(object):
 
         variables_mapping = step.variables
         variables_mapping.update(extract_mapping)
+
+        # teardown hooks
+        if step.teardown_hooks:
+            self.__call_hooks(step.teardown_hooks, step.variables, "teardown request")
+
         # 执行teardown
         if step.teardown:
             self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
