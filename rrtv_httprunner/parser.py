@@ -19,8 +19,8 @@ dolloar_regex_compile = re.compile(r"\$\$")
 # variable notation, e.g. ${var} or $var
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
-function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\S\w\s=,]*)\)\}")
-# function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\}\)\[\]\'\,\(\{\w\;\!\:\*\.\-/\s=,]*)\)\}")
+# function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\S\w\s=,]*)\)\}")
+function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\}\)\[\]\'\,\(\{\w\;\!\:\*\.\-/\s\=\,]*)\)\}")
 
 suffix_regex_compile1 = r'\[\'(.*?)\'\]'
 suffix_regex_compile2 = r"\[(.*?)\]"
@@ -204,6 +204,7 @@ def parse_function_params(params: Text, func_name: Text) -> Dict:
     if params_str == "":
         return function_meta
     args_list: List = []
+    # todo bug kv形式传参时会报错
     if "${" in params_str and ")}" in params_str:
         args_list.append(params_str)
     else:
@@ -343,9 +344,7 @@ def parse_string(
         if func_match:
             func_name = func_match.group(1)
             func = get_mapping_function(func_name, functions_mapping)
-
             func_params_str = func_match.group(2)
-            logger.debug("func_params_str", func_params_str)
             function_meta = parse_function_params(func_params_str, func_name)
             args = function_meta["args"]
             kwargs = function_meta["kwargs"]
