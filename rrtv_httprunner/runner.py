@@ -232,10 +232,10 @@ class HttpRunner(object):
             err_msg += f"headers: {headers}\n"
             for k, v in parsed_request_dict.items():
                 v = utils.omit_long_data(v)
-                if isinstance(v, str):
+                if isinstance(v, Text):
                     v = unquote(v)
-                if isinstance(v, dict):
-                    v = {k: unquote(v) for k, v in v.items() if isinstance(v, str)}
+                if isinstance(v, Dict):
+                    v = {k: unquote(v) for k, v in v.items() if isinstance(v, Text)}
                 err_msg += f"{k}: {repr(v)}\n"
 
             err_msg += "\n"

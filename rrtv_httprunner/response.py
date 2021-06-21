@@ -7,9 +7,8 @@ from loguru import logger
 
 from rrtv_httprunner import exceptions
 from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
-from rrtv_httprunner.models import VariablesMapping, Validators, FunctionsMapping, data_enum
+from rrtv_httprunner.models import VariablesMapping, Validators, FunctionsMapping
 from rrtv_httprunner.parser import parse_data, parse_string_value, get_mapping_function
-from rrtv_httprunner.utils import get_statement_type
 
 
 def get_uniform_comparator(comparator: Text):
@@ -183,14 +182,16 @@ class ResponseObject(object):
             "cookies": self.cookies,
             "body": self.body,
         }
-        if expr is None: return None
+        if expr is None:
+            return None
         try:
             key_list = [key for key in resp_obj_meta.keys()]
-            flag = False
-            for k in key_list:
-                if not isinstance(expr, int):
-                    if k in expr:
-                        flag = True
+            # flag = False
+            # for k in key_list:
+            #     if not isinstance(expr, int):
+            #         if k in expr:
+            #             flag = True
+            flag = any(k in expr for k in key_list if not isinstance(expr, int))
             check_value = jmespath.search(expr, resp_obj_meta) if flag is True else expr
         except JMESPathError as ex:
             check_value = parse_string_value(expr)

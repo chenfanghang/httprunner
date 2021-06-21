@@ -19,8 +19,8 @@ dolloar_regex_compile = re.compile(r"\$\$")
 # variable notation, e.g. ${var} or $var
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
-# function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\w\;\!\:\*\.\-/\s=,]*)\)\}")
-function_regex_compile = re.compile(r"\$\{(\w+)\(((?!\$\{).*)\)\}")
+function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\S\w\s=,]*)\)\}")
+# function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\}\)\[\]\'\,\(\{\w\;\!\:\*\.\-/\s=,]*)\)\}")
 
 suffix_regex_compile1 = r'\[\'(.*?)\'\]'
 suffix_regex_compile2 = r"\[(.*?)\]"
@@ -203,8 +203,14 @@ def parse_function_params(params: Text, func_name: Text) -> Dict:
     params_str = params.strip()
     if params_str == "":
         return function_meta
-
-    args_list = params_str.split(",")
+    args_list: List = []
+    if "${" in params_str and ")}" in params_str:
+        args_list.append(params_str)
+    else:
+        func_match = function_regex_compile.match(params_str, 0)
+        if func_match:
+            params_str = func_match.group(2)
+        args_list = params_str.split(",")
     for arg in args_list:
         arg = arg.strip()
 
@@ -339,6 +345,7 @@ def parse_string(
             func = get_mapping_function(func_name, functions_mapping)
 
             func_params_str = func_match.group(2)
+            logger.debug("func_params_str", func_params_str)
             function_meta = parse_function_params(func_params_str, func_name)
             args = function_meta["args"]
             kwargs = function_meta["kwargs"]
@@ -437,7 +444,8 @@ def parse_data(
         if get_statement_type(var_value) == data_enum.MYSQL:
             try:
                 if data_enum.DB_CONFIG_SYMBOL in var_value:  # 指定环境执行sql
-                    value = execute_sql(var_value.split(data_enum.DB_CONFIG_SYMBOL)[1], var_value.split(data_enum.DB_CONFIG_SYMBOL)[0])
+                    value = execute_sql(var_value.split(data_enum.DB_CONFIG_SYMBOL)[1],
+                                        var_value.split(data_enum.DB_CONFIG_SYMBOL)[0])
                 else:
                     value = execute_sql(variables_mapping[data_enum.MYSQL], var_value)
             except KeyError:  # 没配置数据源
@@ -456,7 +464,8 @@ def parse_data(
         elif get_statement_type(var_value) == data_enum.REDIS:
             try:
                 if data_enum.DB_CONFIG_SYMBOL in var_value:  # 指定环境执行redis
-                    return execute_redis(var_value.split(data_enum.DB_CONFIG_SYMBOL)[1], var_value.split(data_enum.DB_CONFIG_SYMBOL)[0])
+                    return execute_redis(var_value.split(data_enum.DB_CONFIG_SYMBOL)[1],
+                                         var_value.split(data_enum.DB_CONFIG_SYMBOL)[0])
                 else:
                     return execute_redis(variables_mapping[data_enum.REDIS], var_value)
             except KeyError:  # 没配置数据源
@@ -464,7 +473,8 @@ def parse_data(
         elif get_statement_type(var_value) == data_enum.MONGO:
             try:
                 if data_enum.DB_CONFIG_SYMBOL in var_value:  # 指定环境执行mongo
-                    return execute_mongo(var_value.split(data_enum.DB_CONFIG_SYMBOL)[1], var_value.split(data_enum.DB_CONFIG_SYMBOL)[0])
+                    return execute_mongo(var_value.split(data_enum.DB_CONFIG_SYMBOL)[1],
+                                         var_value.split(data_enum.DB_CONFIG_SYMBOL)[0])
                 else:
                     return execute_mongo(variables_mapping[data_enum.MONGO], var_value)
             except KeyError:  # 没配置数据源
