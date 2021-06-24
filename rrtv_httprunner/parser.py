@@ -207,6 +207,7 @@ def parse_function_params(params: Text, func_name: Text) -> Dict:
     # todo bug kv形式传参时会报错
     if "${" in params_str and ")}" in params_str:
         args_list.append(params_str)
+        args_list = params_str.split(",")
     else:
         func_match = function_regex_compile.match(params_str, 0)
         if func_match:
