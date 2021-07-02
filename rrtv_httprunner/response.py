@@ -166,13 +166,14 @@ class ResponseObject(object):
                 for attr in dir(self.resp_obj):
                     if attr == "text":
                         response_dict[attr] = getattr(self.resp_obj, attr)
-                response_dict['text'] = demjson.decode(response_dict['text'])
                 response_body = {}
-                for k, v in response_dict['text'].items():
-                    response_body[k] = v
-                for k, v in response_body["data"].items():
-                    if isinstance(k, int):
-                        response_body["data"][str(k)] = response_body["data"].pop(k)
+                if "text" in response_dict and response_dict["text"] != "":
+                    response_dict['text'] = demjson.decode(response_dict['text'])
+                    for k, v in response_dict['text'].items():
+                        response_body[k] = v
+                    for k, v in response_body["data"].items():
+                        if isinstance(k, int):
+                            response_body["data"][str(k)] = response_body["data"].pop(k)
                 value = response_body
                 # value = self.resp_obj.content
         elif key == "cookies":
