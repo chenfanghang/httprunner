@@ -3,6 +3,7 @@ import random
 import string
 import time
 import uuid
+from typing import Text
 
 from loguru import logger
 
@@ -146,3 +147,23 @@ def alter_response_error(response):
 
 def gen_variables():
     return {"var_a": 1, "var_b": 2}
+
+
+def str2int(value: Text):
+    return int(value)
+
+
+def test11(val):
+    return val
+
+
+def test22(val1):
+    return str(int(val1))
+
+
+def test33(val1, val2):
+    return str(int(val1) + int(val2))
+
+
+def test44(val1, val2):
+    return str(int(val1) + int(val2))

@@ -1,5 +1,6 @@
 from typing import Dict, Text, Any, NoReturn
 
+import demjson
 import jmespath
 import requests
 from jmespath.exceptions import JMESPathError
@@ -161,7 +162,19 @@ class ResponseObject(object):
             try:
                 value = self.resp_obj.json()
             except ValueError:
-                value = self.resp_obj.content
+                response_dict = {}
+                for attr in dir(self.resp_obj):
+                    if attr == "text":
+                        response_dict[attr] = getattr(self.resp_obj, attr)
+                response_dict['text'] = demjson.decode(response_dict['text'])
+                response_body = {}
+                for k, v in response_dict['text'].items():
+                    response_body[k] = v
+                for k, v in response_body["data"].items():
+                    if isinstance(k, int):
+                        response_body["data"][str(k)] = response_body["data"].pop(k)
+                value = response_body
+                # value = self.resp_obj.content
         elif key == "cookies":
             value = self.resp_obj.cookies.get_dict()
         else:
@@ -186,11 +199,6 @@ class ResponseObject(object):
             return None
         try:
             key_list = [key for key in resp_obj_meta.keys()]
-            # flag = False
-            # for k in key_list:
-            #     if not isinstance(expr, int):
-            #         if k in expr:
-            #             flag = True
             flag = any(k in expr for k in key_list if not isinstance(expr, int))
             check_value = jmespath.search(expr, resp_obj_meta) if flag is True else expr
         except JMESPathError as ex:

@@ -2,6 +2,7 @@ import json
 import time
 from typing import Dict
 
+import demjson
 import requests
 import urllib3
 from loguru import logger
@@ -88,8 +89,16 @@ def get_req_resp_record(resp_obj: Response) -> ReqRespData:
             response_body = resp_obj.json()
         except ValueError:
             # only record at most 512 text charactors
-            resp_text = resp_obj.text
-            response_body = omit_long_data(resp_text)
+            # resp_text = resp_obj.text
+            response_dict = {}
+            for attr in dir(resp_obj):
+                if attr == "text":
+                    response_dict[attr] = getattr(resp_obj, attr)
+            response_dict['text'] = demjson.decode(response_dict['text'])
+            response_body = {}
+            for k, v in response_dict['text'].items():
+                response_body[k] = v
+            response_body = omit_long_data(response_dict['text'])
 
     response_data = ResponseData(
         status_code=resp_obj.status_code,
@@ -187,6 +196,15 @@ class HttpSession(requests.Session):
         start_timestamp = time.time()
         response = self._send_request_safe_mode(method, url, **kwargs)
         response_time_ms = round((time.time() - start_timestamp) * 1000, 2)
+
+        # response_dict = {}
+        # for attr in dir(response):
+        #     if attr == "text":
+        #         response_dict[attr] = getattr(response, attr)
+        # response_dict['text'] = demjson.encode(response_dict['text'])
+        # response_body = {}
+        # for k, v in response_dict['text'].items():
+        #     response_body[k] = v
 
         try:
             client_ip, client_port = response.raw.connection.sock.getsockname()
