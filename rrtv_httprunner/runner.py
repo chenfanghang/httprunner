@@ -11,7 +11,7 @@ try:
     USE_ALLURE = True
 except ModuleNotFoundError:
     USE_ALLURE = False
-
+# import allure
 from loguru import logger
 
 from rrtv_httprunner import utils, exceptions
@@ -19,10 +19,6 @@ from rrtv_httprunner.client import HttpSession
 from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
 from rrtv_httprunner.ext.uploader import prepare_upload_step
 from rrtv_httprunner.loader import load_project_meta, load_testcase_file
-from rrtv_httprunner.parser import build_url, parse_data, parse_variables_mapping
-from rrtv_httprunner.response import ResponseObject
-from rrtv_httprunner.testcase import Config, Step
-from rrtv_httprunner.utils import merge_variables
 from rrtv_httprunner.models import (
     TConfig,
     TStep,
@@ -33,8 +29,12 @@ from rrtv_httprunner.models import (
     TestCaseInOut,
     ProjectMeta,
     TestCase,
-    Hooks, data_enum,
+    Hooks, data_enum, AllureParameter,
 )
+from rrtv_httprunner.parser import build_url, parse_data, parse_variables_mapping
+from rrtv_httprunner.response import ResponseObject
+from rrtv_httprunner.testcase import Config, Step
+from rrtv_httprunner.utils import merge_variables
 
 
 class HttpRunner(object):
@@ -216,6 +216,8 @@ class HttpRunner(object):
         parsed_request_dict["verify"] = self.__config.verify
         parsed_request_dict["json"] = parsed_request_dict.pop("req_json", {})
 
+        a = AllureParameter()
+        parsed_request_dict["allure"] = a
         # request
         resp = self.__session.request(method, url, **parsed_request_dict)
         resp_obj = ResponseObject(resp)
@@ -289,6 +291,9 @@ class HttpRunner(object):
         # 执行teardown
         if step.teardown:
             self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
+        if USE_ALLURE:
+            # update allure report meta
+            allure.attach(a.curl, "curl:", allure.attachment_type.TEXT)
         return step_data
 
     def __run_step_testcase(self, step: TStep) -> StepData:

@@ -2,6 +2,7 @@ import json
 import time
 from typing import Dict
 
+import curlify as curlify
 import demjson
 import requests
 import urllib3
@@ -196,16 +197,6 @@ class HttpSession(requests.Session):
         start_timestamp = time.time()
         response = self._send_request_safe_mode(method, url, **kwargs)
         response_time_ms = round((time.time() - start_timestamp) * 1000, 2)
-
-        # response_dict = {}
-        # for attr in dir(response):
-        #     if attr == "text":
-        #         response_dict[attr] = getattr(response, attr)
-        # response_dict['text'] = demjson.encode(response_dict['text'])
-        # response_body = {}
-        # for k, v in response_dict['text'].items():
-        #     response_body[k] = v
-
         try:
             client_ip, client_port = response.raw.connection.sock.getsockname()
             self.data.address.client_ip = client_ip
@@ -255,6 +246,16 @@ class HttpSession(requests.Session):
         Safe mode has been removed from requests 1.x.
         """
         try:
+            if "allure" in kwargs:
+                a = kwargs["allure"]
+                kwargs.pop("allure")
+                rep = requests.Session.request(self, method, url, **kwargs)
+                a.curl = curlify.to_curl(rep.request, compressed=True)
+                logger.debug(f"curl: {a.curl}")
+            else:
+                rep = requests.Session.request(self, method, url, **kwargs)
+                self.curl = curlify.to_curl(rep.request, compressed=True)
+                logger.debug(f"curl: {self.curl}")
             return requests.Session.request(self, method, url, **kwargs)
         except (MissingSchema, InvalidSchema, InvalidURL):
             raise

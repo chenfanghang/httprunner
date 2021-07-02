@@ -224,5 +224,9 @@ class DataCorrelationEnum(BaseModel):
     SUPPORT_TYPES: List = [MYSQL, REDIS, MONGO]
 
 
+class AllureParameter(BaseModel):
+    curl: Text=""
+
+
 # 单例
 data_enum = DataCorrelationEnum()
