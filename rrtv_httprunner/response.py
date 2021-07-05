@@ -10,6 +10,7 @@ from rrtv_httprunner import exceptions
 from rrtv_httprunner.exceptions import ValidationFailure, ParamsError
 from rrtv_httprunner.models import VariablesMapping, Validators, FunctionsMapping
 from rrtv_httprunner.parser import parse_data, parse_string_value, get_mapping_function
+from rrtv_httprunner.utils import is_json
 
 
 def get_uniform_comparator(comparator: Text):
@@ -168,12 +169,15 @@ class ResponseObject(object):
                         response_dict[attr] = getattr(self.resp_obj, attr)
                 response_body = {}
                 if "text" in response_dict and response_dict["text"] != "":
-                    response_dict['text'] = demjson.decode(response_dict['text'])
-                    for k, v in response_dict['text'].items():
-                        response_body[k] = v
-                    for k, v in response_body["data"].items():
-                        if isinstance(k, int):
-                            response_body["data"][str(k)] = response_body["data"].pop(k)
+                    if is_json(response_dict["text"]):
+                        response_dict['text'] = demjson.decode(response_dict['text'])
+                        for k, v in response_dict['text'].items():
+                            response_body[k] = v
+                        for k, v in response_body["data"].items():
+                            if isinstance(k, int):
+                                response_body["data"][str(k)] = response_body["data"].pop(k)
+                    else:
+                        response_body["data"] = response_dict['text']
                 value = response_body
                 # value = self.resp_obj.content
         elif key == "cookies":

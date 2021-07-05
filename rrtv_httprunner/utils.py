@@ -226,6 +226,14 @@ def is_support_multiprocessing() -> bool:
         return False
 
 
+def is_json(myjson):
+    try:
+        json_object = json.loads(myjson)
+    except ValueError as e:
+        return False
+    return True
+
+
 def gen_cartesian_product(*args: List[Dict]) -> List[Dict]:
     """ generate cartesian product for lists
 

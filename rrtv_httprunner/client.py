@@ -17,7 +17,7 @@ from requests.exceptions import (
 
 from rrtv_httprunner.models import RequestData, ResponseData
 from rrtv_httprunner.models import SessionData, ReqRespData
-from rrtv_httprunner.utils import lower_dict_keys, omit_long_data, quote_dict, unquote_dict
+from rrtv_httprunner.utils import lower_dict_keys, omit_long_data, quote_dict, unquote_dict, is_json
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -95,11 +95,12 @@ def get_req_resp_record(resp_obj: Response) -> ReqRespData:
             for attr in dir(resp_obj):
                 if attr == "text":
                     response_dict[attr] = getattr(resp_obj, attr)
-            if "text" in response_dict and response_dict["text"] !="":
-                response_dict['text'] = demjson.decode(response_dict['text'])
-                response_body = {}
-                for k, v in response_dict['text'].items():
-                    response_body[k] = v
+            if "text" in response_dict and response_dict["text"] != "":
+                if is_json(response_dict["text"]):
+                    response_dict['text'] = demjson.decode(response_dict['text'])
+                    response_body = {}
+                    for k, v in response_dict['text'].items():
+                        response_body[k] = v
             response_body = omit_long_data(response_dict['text'])
 
     response_data = ResponseData(
