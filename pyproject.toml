@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rrtv-httprunner"
-version = "2.3.15"
+version = "2.3.18"
 description = "One-stop solution for HTTP(S) testing."
 license = "Apache-2.0"
 readme = "README.md"

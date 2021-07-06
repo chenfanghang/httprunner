@@ -220,6 +220,9 @@ class HttpRunner(object):
         parsed_request_dict["allure"] = a
         # request
         resp = self.__session.request(method, url, **parsed_request_dict)
+        if USE_ALLURE:
+            # update allure report meta
+            allure.attach(a.curl, "curl:", allure.attachment_type.TEXT)
         resp_obj = ResponseObject(resp)
         step.variables["response"] = resp_obj
 
@@ -291,9 +294,6 @@ class HttpRunner(object):
         # 执行teardown
         if step.teardown:
             self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
-        if USE_ALLURE:
-            # update allure report meta
-            allure.attach(a.curl, "curl:", allure.attachment_type.TEXT)
         return step_data
 
     def __run_step_testcase(self, step: TStep) -> StepData:
@@ -509,11 +509,12 @@ class HttpRunner(object):
         self.__config.name = parse_data(
             self.__config.name, config_variables, self.__project_meta.functions
         )
-
+        url = str(self.__config.base_url if self.__config.base_url[-1] != "/" else self.__config.base_url[0:-2]) + str(
+            self.__teststeps[0].request.url)
         if USE_ALLURE:
             # update allure report meta
             allure.dynamic.title(self.__config.name)
-            allure.dynamic.description(f"TestCase ID: {self.__case_id}")
+            allure.dynamic.description(f"URL:{url}")
 
         logger.info(
             f"Start to run testcase: {self.__config.name}, TestCase ID: {self.__case_id}"

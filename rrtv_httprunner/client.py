@@ -248,17 +248,12 @@ class HttpSession(requests.Session):
         Safe mode has been removed from requests 1.x.
         """
         try:
-            if "allure" in kwargs:
-                a = kwargs["allure"]
-                kwargs.pop("allure")
-                rep = requests.Session.request(self, method, url, **kwargs)
-                a.curl = curlify.to_curl(rep.request, compressed=True)
-                logger.debug(f"curl: {a.curl}")
-            else:
-                rep = requests.Session.request(self, method, url, **kwargs)
-                self.curl = curlify.to_curl(rep.request, compressed=True)
-                logger.debug(f"curl: {self.curl}")
-            return requests.Session.request(self, method, url, **kwargs)
+            a = kwargs["allure"]
+            kwargs.pop("allure")
+            rep = requests.Session.request(self, method, url, **kwargs)
+            a.curl = curlify.to_curl(rep.request, compressed=True)
+            logger.debug(f"curl: {a.curl}")
+            return rep
         except (MissingSchema, InvalidSchema, InvalidURL):
             raise
         except RequestException as ex:
