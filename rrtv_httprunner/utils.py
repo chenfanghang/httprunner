@@ -373,7 +373,7 @@ def execute_redis(rd: Union[Text, Dict, List], cli: Text) -> Any:
                     return 1
                 elif data_source.index(v) == len(data_source) - 1 and value == 0:
                     return 0
-            if is_exists() is True:
+            elif is_exists() is True:
                 if value == 1:
                     logger.debug(f"在{v}中存在key:{content}")
                     return value
