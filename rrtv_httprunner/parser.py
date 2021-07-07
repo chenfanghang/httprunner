@@ -19,7 +19,7 @@ dolloar_regex_compile = re.compile(r"\$\$")
 # variable notation, e.g. ${var} or $var
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
-function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\S\w\s=,]*)\)\}")
+function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\S\w\s=,]*?)\)\}")
 # function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\}\)\[\]\'\,\(\{\w\;\!\:\*\.\-/\s\=\,]*)\)\}")
 
 suffix_regex_compile1 = r'\[\'(.*?)\'\]'
