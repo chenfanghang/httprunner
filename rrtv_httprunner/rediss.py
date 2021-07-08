@@ -9,7 +9,8 @@ from rrtv_httprunner import exceptions
 
 class RedisHandler:
     def __init__(self, driver: Union[Text, Dict]):
-
+        if driver is None:
+            raise exceptions.DBError("redis datasource not configured")
         driver = driver if isinstance(driver, dict) else eval(driver)
         try:
             self.r = redis.Redis(host=str(driver["host"]), password=driver["password"], port=int(driver["port"]),

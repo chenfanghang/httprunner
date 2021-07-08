@@ -218,6 +218,9 @@ class HttpRunner(object):
 
         a = AllureParameter()
         parsed_request_dict["allure"] = a
+        if USE_ALLURE:
+            # update allure report meta
+            allure.tag(url)
         # request
         resp = self.__session.request(method, url, **parsed_request_dict)
         if USE_ALLURE:

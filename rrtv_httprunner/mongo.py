@@ -5,6 +5,8 @@ from typing import Text
 from loguru import logger
 from pymongo import MongoClient
 
+from rrtv_httprunner import exceptions
+
 
 def find_last_index(string: Text, expected_str: Text) -> int:
     last_position = -1
@@ -17,6 +19,8 @@ def find_last_index(string: Text, expected_str: Text) -> int:
 
 class MongoHandler:
     def __init__(self, driver: Text):
+        if driver is None:
+            raise exceptions.DBError("mongo datasource not configured")
         self.client = MongoClient(driver)
         self.db = self.client[driver[find_last_index(driver, "/") + 1:find_last_index(driver, "?")]]
 

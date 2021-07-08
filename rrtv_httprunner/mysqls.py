@@ -14,6 +14,8 @@ class MySQLHandler(object):
 
     # 也可以继承 Connection 这里没有选择继承
     def __init__(self, driver: Union[str, dict], **kwargs):
+        if driver is None:
+            raise exceptions.DBError("mysql datasource not configured")
         driver = driver if isinstance(driver, dict) else eval(driver)
         try:
             self.connect = pymysql.connect(
