@@ -436,3 +436,19 @@ def unquote_dict(value: Union[Text, Dict]):
         return value
     else:
         return value
+
+
+def legitimate_method_call(value):
+    if value != "" and value is not None:
+        i = 0
+        is_show_left: bool = False
+        value = list(value)
+        while i != len(value) - 1:
+            i = i + 1
+            if is_show_left is False and (value[i] == ")" or value[i] == "}"):
+                return False
+            elif value[i] == "{":
+                is_show_left = True
+        return True
+    else:
+        return True

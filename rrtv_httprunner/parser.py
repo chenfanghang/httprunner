@@ -10,7 +10,7 @@ from sentry_sdk import capture_exception
 from rrtv_httprunner import loader, utils, exceptions
 from rrtv_httprunner.models import VariablesMapping, FunctionsMapping, data_enum
 from rrtv_httprunner.utils import execute_sql, execute_cmd, get_statement_type, execute_redis, execute_mongo, \
-    remove_bracket_first
+    remove_bracket_first, legitimate_method_call
 
 absolute_http_url_regexp = re.compile(r"^https?://", re.I)
 
@@ -20,6 +20,7 @@ dolloar_regex_compile = re.compile(r"\$\$")
 variable_regex_compile = re.compile(r"\$\{(\w+)\}|\$(\w+)")
 # function notation, e.g. ${func1($var_1, $var_3)}
 function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\S\w\s=,]*)\)\}")
+function_regex_compile2 = re.compile(r"\$\{(\w+)\(([\$\S\w\s=,]*?)\)\}")
 # function_regex_compile = re.compile(r"\$\{(\w+)\(([\$\}\)\[\]\'\,\(\{\w\;\!\:\*\.\-/\s\=\,]*)\)\}")
 
 suffix_regex_compile1 = r'\[\'(.*?)\'\]'
@@ -341,7 +342,14 @@ def parse_string(
             continue
 
         # search function like ${func($a, $b)}
-        func_match = function_regex_compile.match(raw_string, match_start_position)
+        func_match1 = function_regex_compile.match(raw_string, match_start_position)
+        if func_match1 is not None:
+            if legitimate_method_call(func_match1.group(2)) is True:
+                func_match = function_regex_compile.match(raw_string, match_start_position)
+            else:
+                func_match = function_regex_compile2.match(raw_string, match_start_position)
+        else:
+            func_match = None
         if func_match:
             func_name = func_match.group(1)
             func = get_mapping_function(func_name, functions_mapping)

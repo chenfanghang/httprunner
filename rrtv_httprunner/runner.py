@@ -5,6 +5,8 @@ import uuid
 from typing import List, Dict, Text, NoReturn
 from urllib.parse import unquote
 
+import demjson
+
 try:
     import allure
 
@@ -220,14 +222,24 @@ class HttpRunner(object):
         parsed_request_dict["allure"] = a
         if USE_ALLURE:
             # update allure report meta
-            allure.tag(url)
+            allure.dynamic.tag(url)
         # request
         resp = self.__session.request(method, url, **parsed_request_dict)
-        if USE_ALLURE:
-            # update allure report meta
-            allure.attach(a.curl, "curl:", allure.attachment_type.TEXT)
         resp_obj = ResponseObject(resp)
         step.variables["response"] = resp_obj
+        if USE_ALLURE:
+            # update allure report meta
+            allure.attach(str(resp_obj.resp_obj.status_code), "状态码:", allure.attachment_type.TEXT)
+            try:
+                if resp_obj.resp_obj.text is not None and resp_obj.resp_obj.text != "":
+                    value = demjson.decode(resp_obj.resp_obj.text)
+                    if "code" in value:
+                        allure.attach(str(value["code"]), "code:", allure.attachment_type.TEXT)
+                    if "msg" in value:
+                        allure.attach(str(value["msg"]), "msg:", allure.attachment_type.TEXT)
+            except:
+                pass
+            allure.attach(a.curl, "curl:", allure.attachment_type.TEXT)
 
         def log_req_resp_details():
             err_msg = "\n{} DETAILED REQUEST & RESPONSE {}\n".format("*" * 32, "*" * 32)
