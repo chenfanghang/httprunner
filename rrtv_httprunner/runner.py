@@ -220,9 +220,6 @@ class HttpRunner(object):
 
         a = AllureParameter()
         parsed_request_dict["allure"] = a
-        if USE_ALLURE:
-            # update allure report meta
-            allure.dynamic.tag(url)
         # request
         resp = self.__session.request(method, url, **parsed_request_dict)
         resp_obj = ResponseObject(resp)
@@ -524,12 +521,15 @@ class HttpRunner(object):
         self.__config.name = parse_data(
             self.__config.name, config_variables, self.__project_meta.functions
         )
-        url = str(self.__config.base_url if self.__config.base_url[-1] != "/" else self.__config.base_url[0:-2]) + str(
-            self.__teststeps[0].request.url)
         if USE_ALLURE:
             # update allure report meta
             allure.dynamic.title(self.__config.name)
-            allure.dynamic.description(f"URL:{url}")
+            if self.__teststeps[-1].request is not None:
+                requestUrl = self.__teststeps[-1].request.url
+                url = str(self.__config.base_url if self.__config.base_url[-1] != "/" else self.__config.base_url[
+                                                                                           0:-2]) + str(
+                    requestUrl)
+                allure.dynamic.description(f"URL:{url}")
 
         logger.info(
             f"Start to run testcase: {self.__config.name}, TestCase ID: {self.__case_id}"
