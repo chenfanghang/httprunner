@@ -299,13 +299,14 @@ class HttpRunner(object):
                 # save step data
                 step_data.data = self.__session.data
 
-        # teardown hooks
-        if step.teardown_hooks:
-            self.__call_hooks(step.teardown_hooks, step.variables, "teardown request")
+                # teardown hooks
+                if step.teardown_hooks:
+                    self.__call_hooks(step.teardown_hooks, step.variables, "teardown request")
 
-        # 执行teardown
-        if step.teardown:
-            self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
+                # 执行teardown
+                if step.teardown:
+                    self.__execute("teardown", step, variables_mapping, self.__project_meta.functions)
+
         return step_data
 
     def __run_step_testcase(self, step: TStep) -> StepData:
